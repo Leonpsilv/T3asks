@@ -122,14 +122,14 @@
   :root {
 
     /* sidebar styles */
-    --sidebar: oklch(64.412% 0.10885 20.471);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+    --sidebar: #1b2506;
+    --sidebar-foreground: #fff;
+    --sidebar-primary: oklch(61.562% 0.12323 124.342);
+    --sidebar-primary-foreground: oklch(57.878% 0.23223 28.729);  
+    --sidebar-accent: #0c0625;
+    --sidebar-accent-foreground: #fff;
+    --sidebar-border:  #1b2506;
+    --sidebar-ring: #b6c48e;
   }
 
   .dark {

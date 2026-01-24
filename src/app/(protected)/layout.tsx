@@ -20,8 +20,8 @@ export default async function ProtectedLayout({
     <AuthProvider session={session}>
       <SidebarProvider>
         <AppSidebar />
-        <div>
-          <SidebarTrigger />
+        <div className="w-[100%] flex items-center justify-center">
+          {/* <SidebarTrigger /> */}
           {children}
         </div>
       </SidebarProvider>

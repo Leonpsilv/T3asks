@@ -13,10 +13,10 @@ import {
     SidebarMenuItem,
     useSidebar
 } from "~/components/ui/sidebar";
-import { Calendar, Home, User2Icon, MenuIcon } from "lucide-react"
+import { Calendar, Home, LogOutIcon, User2Icon } from "lucide-react"
 import { cn } from "~/lib/utils";
 
-import img from "public/favicon.svg"
+import img from "public/icons/white_icon.svg"
 import Image from "next/image";
 import { logoutAction } from "./actions";
 
@@ -28,17 +28,17 @@ const items = [
     {
         title: "Home",
         url: "/",
-        icon: Home,
+        icon: <Home size={20} />,
     },
     {
         title: "Tarefas",
         url: "/tasks",
-        icon: Calendar,
+        icon: <Calendar size={20} />,
     },
     {
         title: "Usuários",
         url: "#",
-        icon: User2Icon,
+        icon: <User2Icon size={20} />,
     },
 ]
 
@@ -65,15 +65,15 @@ export function AppSidebar({
                     <SidebarHeader>
                         <div
                             onClick={() => setOpen(!open)}
-                            className="flex items-center justify-center"
+                            className="flex items-center justify-center gap-[5px] cursor-pointer hover:bg-[#0c0625] rounded-md"
                         >
                             <Image
                                 src={img}
                                 alt="Logo em formato de folha"
-                                className="w-[30px]"
+                                className="w-[33px]"
                             />
                             {open &&
-                                <span>
+                                <span className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#e0e1d7] to-[#dff8a7]">
                                     T3asks
                                 </span>}
 
@@ -84,9 +84,9 @@ export function AppSidebar({
                             {items.map((item) => (
                                 <SidebarMenuItem key={item.title}>
                                     <SidebarMenuButton asChild>
-                                        <a href={item.url}>
-                                            <item.icon />
-                                            <span>{item.title}</span>
+                                        <a href={item.url} className="text-lg3">
+                                            {item.icon}
+                                            <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#e0e1d7] to-[#dff8a7]">{item.title}</span>
                                         </a>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
@@ -94,11 +94,8 @@ export function AppSidebar({
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
-                <SidebarFooter
-                    className=""
-                    onClick={async () => await logoutAction()}
-                >
-                    Sair
+                <SidebarFooter className="absolute bottom-0 w-full mb-10 hover:bg-[#0c0625] p-2 rounded-md cursor-pointer">
+                    <LogOutIcon className="m-0 mx-auto" onClick={async () => await logoutAction()}/>
                 </SidebarFooter>
             </SidebarContent>
         </Sidebar>
