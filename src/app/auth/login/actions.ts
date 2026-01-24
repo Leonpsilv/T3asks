@@ -10,12 +10,6 @@ export interface loginDataDTO {
     password: string;
 }
 
-export interface registerDataDTO {
-    email: string;
-    password: string;
-    name: string;
-}
-
 export async function loginAction(data: loginDataDTO) {
     const { email, password } = data
 

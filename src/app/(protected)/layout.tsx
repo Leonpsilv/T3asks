@@ -1,6 +1,9 @@
 import { redirect } from "next/navigation";
 import { getSession } from "~/server/better-auth/server";
 import { AuthProvider } from "~/app/_contexts/auth-context";
+import { SidebarProvider, SidebarTrigger } from "~/components/ui/sidebar";
+import { AppSidebar } from "../_components/Sidebar";
+
 
 export default async function ProtectedLayout({
   children,
@@ -15,7 +18,13 @@ export default async function ProtectedLayout({
 
   return (
     <AuthProvider session={session}>
-      {children}
+      <SidebarProvider>
+        <AppSidebar />
+        <div>
+          <SidebarTrigger />
+          {children}
+        </div>
+      </SidebarProvider>
     </AuthProvider>
   );
 }
