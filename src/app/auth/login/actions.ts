@@ -1,9 +1,8 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { loginSchema } from "~/schemas/auth";
 import { auth } from "~/server/better-auth";
-import { authClient } from "~/server/better-auth/client";
 
 export interface loginDataDTO {
     email: string;
@@ -11,7 +10,13 @@ export interface loginDataDTO {
 }
 
 export async function loginAction(data: loginDataDTO) {
-    const { email, password } = data
+    const parsed = loginSchema.safeParse(data);
+
+    if (!parsed.success) {
+        throw new Error("Dados inválidos");
+    }
+
+    const { email, password } = parsed.data
 
     const res = await auth.api.signInEmail({
         body: {
@@ -21,9 +26,9 @@ export async function loginAction(data: loginDataDTO) {
         asResponse: true
     })
 
-    // if (!res.ok) {
-    //     throw new Error("Credenciais inválidas");
-    // }
+    if (!res.ok) {
+        throw new Error("Falha ao realizar login");
+    }
 
     redirect("/");
 }

@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { registerSchema } from "~/schemas/auth";
 import { auth } from "~/server/better-auth";
 
 export interface loginDataDTO {
@@ -15,7 +16,13 @@ export interface registerDataDTO {
 }
 
 export async function registerAction(data: registerDataDTO) {
-    const { name, email, password } = data
+    const parsed = registerSchema.safeParse(data)
+
+    if (!parsed.success) {
+        throw new Error("Dados inválidos");
+    }
+
+    const { name, email, password } = parsed.data;
 
     const res = await auth.api.signUpEmail({
         returnHeaders: true,

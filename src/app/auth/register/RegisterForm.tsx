@@ -2,27 +2,27 @@
 
 import { registerAction } from "./actions";
 import { useState } from "react";
-import { redirect } from "next/navigation";
 import { SimpleInput } from "~/app/_components/SimpleInput";
 import { FieldGroup } from "~/components/ui/field";
-import { registerSchema } from "~/schemas/auth";
+import { confirmPasswordSchema, registerSchema } from "~/schemas/auth";
 
 export default function LoginForm() {
     const [loading, setLoading] = useState<boolean>(false);
     const [registerErrorMsg, setRegisterErrorMsg] = useState<string | undefined>();
-    
+
     const [nameOk, setNameOk] = useState<"untouched" | "ok" | "error">("untouched");
     const [nameErrorMsg, setNameErrorMsg] = useState<string | undefined>();
-    
+
     const [emailOk, setEmailOk] = useState<"untouched" | "ok" | "error">("untouched");
     const [emailErrorMsg, setEmailErrorMsg] = useState<string | undefined>();
-    
+
     const [passwordOk, setPasswordOk] = useState<"untouched" | "ok" | "error">("untouched");
     const [passwordErrorMsg, setPasswordErrorMsg] = useState<string | undefined>();
-    
+    const [password, setPassword] = useState<string | undefined>();
+
     const [confirmPasswordOk, setConfirmPasswordOk] = useState<"untouched" | "ok" | "error">("untouched");
     const [confirmPasswordErrorMsg, setConfirmPasswordErrorMsg] = useState<string | undefined>();
-    
+
 
     async function register(formData: FormData) {
         try {
@@ -40,8 +40,11 @@ export default function LoginForm() {
             });
 
         } catch (error) {
-            console.log({ error })
-            setRegisterErrorMsg("Falha ao realizar cadastro");
+            if (error instanceof Error) {
+                setRegisterErrorMsg(error.message);
+            } else {
+                setRegisterErrorMsg("Erro inesperado. Tente novamente em alguns minutos.");
+            }
         } finally {
             setLoading(false);
         }
@@ -50,18 +53,18 @@ export default function LoginForm() {
     function validateName(event: React.ChangeEvent<HTMLInputElement>) {
         const value = event?.target?.value;
 
-        const emailValidationSchema = registerSchema.shape.name; // TODO: continuar aqui
-        const result = emailValidationSchema.safeParse(value);
+        const nameValidationSchema = registerSchema.shape.name;
+        const result = nameValidationSchema.safeParse(value);
 
         if (!result.success) {
             const errors = result.error.flatten().formErrors;
-            setEmailErrorMsg(errors[0]);
-            setEmailOk("error")
+            setNameErrorMsg(errors[0]);
+            setNameOk("error")
             return;
         }
 
-        setEmailOk("ok")
-        setEmailErrorMsg(undefined);
+        setNameOk("ok")
+        setNameErrorMsg(undefined);
     }
 
     function validateEmail(event: React.ChangeEvent<HTMLInputElement>) {
@@ -84,14 +87,40 @@ export default function LoginForm() {
 
     function validatePassword(event: React.ChangeEvent<HTMLInputElement>) {
         const value = event?.target?.value;
+        setPassword(value)
 
-        console.log({ value })
+        const passwordValidationSchema = registerSchema.shape.password;
+        const result = passwordValidationSchema.safeParse(value);
+
+        if (!result.success) {
+            const errors = result.error.flatten().formErrors;
+            setPasswordErrorMsg(errors[0]);
+            setPasswordOk("error")
+            return;
+        }
+
+        setPasswordOk("ok")
+        setPasswordErrorMsg(undefined);
     }
 
     function validateConfirmPassword(event: React.ChangeEvent<HTMLInputElement>) {
         const value = event?.target?.value;
 
-        console.log({ value })
+        const result = confirmPasswordSchema.safeParse({
+            password,
+            confirmPassword: value
+        });
+
+        if (!result.success) {
+            const errors = result.error.issues;
+
+            setConfirmPasswordErrorMsg(errors[0]?.message);
+            setConfirmPasswordOk("error")
+            return;
+        }
+
+        setConfirmPasswordOk("ok")
+        setConfirmPasswordErrorMsg(undefined);
     }
 
     return (
@@ -137,7 +166,7 @@ export default function LoginForm() {
 
                     <SimpleInput
                         onChange={validateConfirmPassword}
-                        name="confirm-password"
+                        name="confirmPassword"
                         type="password"
                         placeholder="Confirme a Senha"
                         title="Confirme a senha"
@@ -147,7 +176,10 @@ export default function LoginForm() {
                 </FieldGroup>
 
                 {!!registerErrorMsg && <span>{registerErrorMsg}</span>}
-                <button className="w-full rounded-md bg-blue-600 py-2 font-semibold hover:bg-blue-700">
+                <button
+                    disabled={!(emailOk === "ok" && passwordOk === "ok" && nameOk === "ok" && confirmPasswordOk === "ok")}
+                    className="w-full rounded-md bg-blue-600 py-2 font-semibold hover:bg-blue-700 cursor-pointer disabled:cursor-default disabled:bg-blue-400 disabled:hover:bg-blue-400"
+                >
                     Criar conta
                 </button>
             </form>

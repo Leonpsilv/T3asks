@@ -7,6 +7,7 @@ import { SimpleInput } from "~/app/_components/SimpleInput";
 import { loginSchema } from "~/schemas/auth";
 
 export default function LoginForm() {
+    const [loading, setLoading] = useState<boolean>(false);
     const [loginErrorMsg, setLoginErrorMsg] = useState<string | undefined>();
 
     const [emailOk, setEmailOk] = useState<"untouched" | "ok" | "error">("untouched");
@@ -14,7 +15,6 @@ export default function LoginForm() {
 
     const [passwordOk, setPasswordOk] = useState<"untouched" | "ok" | "error">("untouched");
     const [passwordErrorMsg, setPasswordErrorMsg] = useState<string | undefined>();
-    const [loading, setLoading] = useState<boolean>(false);
 
     async function login(formData: FormData) {
         try {
@@ -29,8 +29,11 @@ export default function LoginForm() {
             })
 
         } catch (error) {
-            console.log({ error })
-            setLoginErrorMsg("Falha ao realizar login");
+            if (error instanceof Error) {
+                setLoginErrorMsg(error.message);
+            } else {
+                setLoginErrorMsg("Erro inesperado. Tente novamente em alguns minutos.");
+            }
         } finally {
             setLoading(false);
         }
@@ -103,7 +106,7 @@ export default function LoginForm() {
                 </FieldGroup>
                 <button
                     disabled={!(emailOk === "ok" && passwordOk === "ok")}
-                    className="w-full rounded-md bg-white/20 py-2 font-semibold hover:bg-white/30"
+                    className="w-full rounded-md cursor-pointer bg-green-400/50 py-2 hover:bg-green-700/50 font-semibold disabled:cursor-default disabled:bg-green-400/20 disabled:hover:bg-green-400/20"
                 >
                     Entrar
                 </button>
