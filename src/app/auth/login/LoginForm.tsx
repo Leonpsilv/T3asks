@@ -1,11 +1,19 @@
 "use client"
 
-import { redirect } from "next/navigation";
 import { loginAction } from "./actions";
 import { useState } from "react";
+import { FieldGroup } from "~/components/ui/field";
+import { SimpleInput } from "~/app/_components/SimpleInput";
+import { loginSchema } from "~/schemas/auth";
 
 export default function LoginForm() {
     const [loginErrorMsg, setLoginErrorMsg] = useState<string | undefined>();
+
+    const [emailOk, setEmailOk] = useState<"untouched" | "ok" | "error">("untouched");
+    const [emailErrorMsg, setEmailErrorMsg] = useState<string | undefined>();
+
+    const [passwordOk, setPasswordOk] = useState<"untouched" | "ok" | "error">("untouched");
+    const [passwordErrorMsg, setPasswordErrorMsg] = useState<string | undefined>();
     const [loading, setLoading] = useState<boolean>(false);
 
     async function login(formData: FormData) {
@@ -28,9 +36,43 @@ export default function LoginForm() {
         }
     }
 
+    function validateEmail(event: React.ChangeEvent<HTMLInputElement>) {
+        const value = event?.target?.value;
+
+        const emailValidationSchema = loginSchema.shape.email;
+        const result = emailValidationSchema.safeParse(value);
+
+        if (!result.success) {
+            const errors = result.error.flatten().formErrors;
+            setEmailErrorMsg(errors[0]);
+            setEmailOk("error")
+            return;
+        }
+
+        setEmailOk("ok")
+        setEmailErrorMsg(undefined);
+    }
+
+    function validatePassword(event: React.ChangeEvent<HTMLInputElement>) {
+        const value = event?.target?.value;
+
+        const passwordValidationSchema = loginSchema.shape.password;
+        const result = passwordValidationSchema.safeParse(value);
+
+        if (!result.success) {
+            const errors = result.error.flatten().formErrors;
+            setPasswordErrorMsg(errors[0]);
+            setPasswordOk("error")
+            return;
+        }
+
+        setPasswordOk("ok")
+        setPasswordErrorMsg(undefined);
+    }
+
     return (
         <div className="w-full max-w-sm rounded-xl bg-white/10 p-8 text-white shadow-xl space-y-6">
-            <h1 className="text-center text-3xl font-bold">T3asks</h1>
+            <h1 className="text-center text-3xl font-bold font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#e0e1d7] to-[#dff8a7]">T3asks</h1>
 
             <h3 className="text-center text-2xl font-light">
                 Faça o seu login
@@ -38,21 +80,31 @@ export default function LoginForm() {
 
             {/* LOGIN */}
             <form action={login} className="space-y-4">
-                <input
-                    name="email"
-                    type="email"
-                    placeholder="Email"
-                    required
-                    className="w-full rounded-md px-4 py-2 text-black"
-                />
-                <input
-                    name="password"
-                    type="password"
-                    placeholder="Senha"
-                    required
-                    className="w-full rounded-md px-4 py-2 text-black"
-                />
-                <button className="w-full rounded-md bg-white/20 py-2 font-semibold hover:bg-white/30">
+                <FieldGroup>
+                    <SimpleInput
+                        onChange={validateEmail}
+                        name="email"
+                        type="email"
+                        placeholder="Email"
+                        title="Email"
+                        errorMsg={emailErrorMsg}
+                        required
+                    />
+
+                    <SimpleInput
+                        onChange={validatePassword}
+                        name="password"
+                        type="password"
+                        placeholder="Senha"
+                        title="Senha"
+                        errorMsg={passwordErrorMsg}
+                        required
+                    />
+                </FieldGroup>
+                <button
+                    disabled={!(emailOk === "ok" && passwordOk === "ok")}
+                    className="w-full rounded-md bg-white/20 py-2 font-semibold hover:bg-white/30"
+                >
                     Entrar
                 </button>
                 {!!loginErrorMsg && <span>{loginErrorMsg}</span>}
@@ -60,7 +112,15 @@ export default function LoginForm() {
 
             <hr className="border-white/20" />
 
-            <span>Ainda não possui uma conta? <span onClick={() => redirect("/auth/register")}> Faça seu cadastro aqui.</span></span>
+            <p>
+                Ainda não possui uma conta?
+                <a
+                    href="/auth/register"
+                    className="ml-[5px] underline"
+                >
+                    Faça seu cadastro aqui.
+                </a>
+            </p>
         </div>
     );
 }
