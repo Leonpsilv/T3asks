@@ -2,12 +2,12 @@
 
 import { loginAction } from "./actions";
 import { useState } from "react";
-import { FieldGroup } from "~/components/ui/field";
+import { FieldError, FieldGroup } from "~/components/ui/field";
 import { SimpleInput } from "~/app/_components/SimpleInput";
 import { loginSchema } from "~/schemas/auth";
+import { SubmitButton } from "~/app/_components/SubmitButton";
 
 export default function LoginForm() {
-    const [loading, setLoading] = useState<boolean>(false);
     const [loginErrorMsg, setLoginErrorMsg] = useState<string | undefined>();
 
     const [emailOk, setEmailOk] = useState<"untouched" | "ok" | "error">("untouched");
@@ -18,7 +18,6 @@ export default function LoginForm() {
 
     async function login(formData: FormData) {
         try {
-            setLoading(true);
             setLoginErrorMsg(undefined);
 
             const email = String(formData.get("email"));
@@ -34,8 +33,9 @@ export default function LoginForm() {
             } else {
                 setLoginErrorMsg("Erro inesperado. Tente novamente em alguns minutos.");
             }
-        } finally {
-            setLoading(false);
+
+            setEmailOk("error")
+            setPasswordOk("error")
         }
     }
 
@@ -104,13 +104,14 @@ export default function LoginForm() {
                         required
                     />
                 </FieldGroup>
-                <button
+
+                <SubmitButton
+                    label="Entrar"
+                    className="w-full flex items-center justify-center gap-2 rounded-md bg-green-400/50 py-2 font-semibold
+                 hover:bg-green-700/50 disabled:cursor-default disabled:bg-green-400/20"
                     disabled={!(emailOk === "ok" && passwordOk === "ok")}
-                    className="w-full rounded-md cursor-pointer bg-green-400/50 py-2 hover:bg-green-700/50 font-semibold disabled:cursor-default disabled:bg-green-400/20 disabled:hover:bg-green-400/20"
-                >
-                    Entrar
-                </button>
-                {!!loginErrorMsg && <span>{loginErrorMsg}</span>}
+                />
+                {!!loginErrorMsg && <FieldError>{loginErrorMsg}</FieldError>}
             </form>
 
             <hr className="border-white/20" />

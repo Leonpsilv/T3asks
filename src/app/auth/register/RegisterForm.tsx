@@ -3,11 +3,11 @@
 import { registerAction } from "./actions";
 import { useState } from "react";
 import { SimpleInput } from "~/app/_components/SimpleInput";
-import { FieldGroup } from "~/components/ui/field";
+import { SubmitButton } from "~/app/_components/SubmitButton";
+import { FieldError, FieldGroup } from "~/components/ui/field";
 import { confirmPasswordSchema, registerSchema } from "~/schemas/auth";
 
 export default function LoginForm() {
-    const [loading, setLoading] = useState<boolean>(false);
     const [registerErrorMsg, setRegisterErrorMsg] = useState<string | undefined>();
 
     const [nameOk, setNameOk] = useState<"untouched" | "ok" | "error">("untouched");
@@ -26,7 +26,6 @@ export default function LoginForm() {
 
     async function register(formData: FormData) {
         try {
-            setLoading(true);
             setRegisterErrorMsg(undefined);
 
             const name = String(formData.get("name"));
@@ -45,8 +44,11 @@ export default function LoginForm() {
             } else {
                 setRegisterErrorMsg("Erro inesperado. Tente novamente em alguns minutos.");
             }
-        } finally {
-            setLoading(false);
+
+            setEmailOk("error")
+            setNameOk("error")
+            setPasswordOk("error")
+            setConfirmPasswordOk("error")
         }
     }
 
@@ -175,13 +177,13 @@ export default function LoginForm() {
                     />
                 </FieldGroup>
 
-                {!!registerErrorMsg && <span>{registerErrorMsg}</span>}
-                <button
-                    disabled={!(emailOk === "ok" && passwordOk === "ok" && nameOk === "ok" && confirmPasswordOk === "ok")}
-                    className="w-full rounded-md bg-blue-600 py-2 font-semibold hover:bg-blue-700 cursor-pointer disabled:cursor-default disabled:bg-blue-400 disabled:hover:bg-blue-400"
-                >
-                    Criar conta
-                </button>
+                <SubmitButton
+                    label="Criar conta"
+                    className="w-full flex items-center justify-center gap-2 rounded-md bg-blue-600 py-2 font-semibold cursor-pointer
+                                 hover:bg-blue-700 disabled:cursor-default disabled:bg-blue-400 disabled:hover:bg-blue-400"
+                    disabled={!(emailOk === "ok" && passwordOk === "ok")}
+                />
+                {!!registerErrorMsg && <FieldError>{registerErrorMsg}</FieldError>}
             </form>
 
             <hr className="border-white/20" />
