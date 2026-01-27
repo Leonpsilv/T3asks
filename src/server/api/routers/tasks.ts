@@ -4,7 +4,7 @@ import {
   createTRPCRouter,
   protectedProcedure,
 } from "~/server/api/trpc";
-import { eq, and, ilike, isNull, between, desc } from "drizzle-orm";
+import { eq, and, ilike, isNull, between, desc, sql } from "drizzle-orm";
 import { tasks } from "~/server/db/schema";
 
 export const tasksRouter = createTRPCRouter({
@@ -89,6 +89,8 @@ export const tasksRouter = createTRPCRouter({
         deadline: z.date().optional(),
         createdAtStart: z.date(),
         createdAtEnd: z.date(),
+        page: z.number().min(1).default(1),
+        pageSize: z.number().min(1).max(100).default(5),
       })
     )
     .query(async ({ ctx, input }) => {
@@ -106,10 +108,30 @@ export const tasksRouter = createTRPCRouter({
         conditions.push(ilike(tasks.title, `%${input.search}%`));
       }
 
-      return ctx.db
+      const totalItemsPromise = ctx.db
+        .select({ count: sql`count(*)` })
+        .from(tasks)
+        .where(and(...conditions))
+        .then((r) => Number(r[0]?.count ?? 0));
+
+      const offset = (input.page - 1) * input.pageSize;
+
+      const itemsPromise = ctx.db
         .select()
         .from(tasks)
         .where(and(...conditions))
-        .orderBy(desc(tasks.createdAt));
+        .orderBy(desc(tasks.createdAt))
+        .limit(input.pageSize)
+        .offset(offset);
+
+      const [totalItems, items] = await Promise.all([totalItemsPromise, itemsPromise])
+
+      return {
+        items,
+        totalItems,
+        totalPages: Math.ceil(totalItems / input.pageSize),
+        page: input.page,
+        pageSize: input.pageSize,
+      };
     }),
 });

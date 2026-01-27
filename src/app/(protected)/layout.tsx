@@ -21,7 +21,6 @@ export default async function ProtectedLayout({
       <SidebarProvider>
         <AppSidebar />
         <div className="w-[100%] flex items-center justify-center">
-          {/* <SidebarTrigger /> */}
           {children}
         </div>
       </SidebarProvider>

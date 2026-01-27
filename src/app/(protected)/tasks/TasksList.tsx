@@ -1,95 +1,246 @@
 "use client";
 
-import { redirect } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { api } from "~/trpc/react";
 
+import {
+    createColumnHelper,
+    flexRender,
+    getCoreRowModel,
+    getSortedRowModel,
+    useReactTable,
+    type ColumnDef,
+    type Row,
+} from "@tanstack/react-table";
+
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Table, TableBody, TableCell, TableHeader, TableRow } from "~/components/ui/table";
+import { DeleteTasksModal } from "./_components/DeleteTasksModal";
+
+interface ITasks {
+    id: string;
+    code: number;
+    title: string | null;
+    description: string | null;
+    status: string | null;
+    userId: string;
+    createdAt: Date;
+    updatedAt: Date | null;
+    deletedAt: Date | null;
+    resolvedAt: Date | null;
+    deadline: Date | null;
+    priorirty: string | null;
+    category: string | null;
+}
+
+const defaultCreatedAtStart = new Date(0);
+const defaultCreatedAtEnd = new Date("2026-02-10");
+
 export default function TasksList() {
-    const utils = api.useUtils();
-    const [status, setStatus] = useState<string>();
+    const [page, setPage] = useState(1);
+    const [pageSize] = useState(10);
+    const [sorting, setSorting] = useState<{ id: string; desc: boolean }>({ id: "createdAt", desc: true });
     const [search, setSearch] = useState("");
+    const [status, setStatus] = useState("");
+    const [createdAtStart, setCreatedAtStart] = useState<Date | null>(null);
+    const [createdAtEnd, setCreatedAtEnd] = useState<Date | null>(null);
 
-    const createdAtStart = useMemo(() => new Date("2026-01-01"), []);
-    const createdAtEnd = useMemo(() => new Date("2026-02-10"), []);
+    const [deleteSelectedTask, setDeleteSelectedTask] = useState<boolean>(false);
 
+    const queryInput = useMemo(() => ({
+        page,
+        pageSize,
+        search: search || undefined,
+        status: status || undefined,
+        createdAtStart: createdAtStart ?? defaultCreatedAtStart,
+        createdAtEnd: createdAtEnd ?? defaultCreatedAtEnd,
+    }), [page, pageSize, search, status, createdAtStart, createdAtEnd]);
 
-    const { data: tasks, isLoading } = api.tasks.list.useQuery({
-        status,
-        search,
-        createdAtStart,
-        createdAtEnd,
+    const { data, isFetching } = api.tasks.list.useQuery(queryInput, {
+        refetchOnMount: false,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
     });
 
+    const columnHelper = useMemo(() => createColumnHelper<ITasks>(), []);
 
-    const deleteTask = api.tasks.delete.useMutation({
-        onSuccess: () => {
-            utils.tasks.list.invalidate();
+    const ActionButtons = useCallback(({ row }: { row: Row<ITasks> }) => {
+        const handleView = () => { };
+        const handleDelete = () => setDeleteSelectedTask(true);
+
+        return (
+            <div style={{ display: 'flex', gap: '8px' }}>
+                <button onClick={handleView}>View</button>
+                <button onClick={handleDelete}>Delete</button>
+            </div>
+        );
+    }, []);
+
+    const columns: Array<ColumnDef<ITasks>> = useMemo(() => [
+        {
+            accessorKey: "code",
+            header: "Código",
         },
-    });
+        {
+            accessorKey: "title",
+            header: "Nome",
+        },
+        {
+            accessorKey: "status",
+            header: "Status",
+            cell: ({ getValue }) => {
+                const value = getValue<string>();
+                if (!value) return "--";
+                return value ?? "--";
+            },
+        },
+        {
+            accessorKey: "priorirty",
+            header: "Prioridade",
+            cell: ({ getValue }) => {
+                const value = getValue<string>();
+                if (!value) return "--";
+                return value ?? "--";
+            },
+        },
+        {
+            accessorKey: "category",
+            header: "Categoria",
+            cell: ({ getValue }) => {
+                const value = getValue<string>();
+                if (!value) return "--";
+                return value ?? "--";
+            },
+        },
+        {
+            accessorKey: "createdAt",
+            header: "Criada em",
+            cell: ({ getValue }) => {
+                const value = getValue<string>();
+                if (!value) return "--";
+                return new Date(value).toLocaleDateString();
+            },
+        },
+        {
+            accessorKey: "resolvedAt",
+            header: "Finalizada em",
+            cell: ({ getValue }) => {
+                const value = getValue<string>();
+                if (!value) return "--";
+                return new Date(value).toLocaleDateString();
+            },
+        },
+        {
+            accessorKey: "deadline",
+            header: "Prazo",
+            cell: ({ getValue }) => {
+                const value = getValue<string>();
+                if (!value) return "--";
+                return new Date(value).toLocaleDateString();
+            },
+        },
+        columnHelper.display({
+            id: 'actions',
+            header: 'Ações',
+            cell: ({ row }) => <ActionButtons row={row} />,
+        }),
+    ], [columnHelper, ActionButtons]);
 
-    if (isLoading) return <p>Carregando tasks...</p>;
+    const tasks = useMemo(() => data?.items ?? [], [data?.items]);
+
+    const tableSorting = useMemo(() => [{ id: sorting.id, desc: sorting.desc }], [sorting.id, sorting.desc]);
+
+    const table = useReactTable({
+        data: tasks,
+        columns,
+        state: {
+            sorting: tableSorting,
+        },
+        onSortingChange: (newSort: any) => {
+            if (newSort.length > 0) {
+                setSorting({ id: newSort[0].id, desc: newSort[0].desc });
+            }
+        },
+        getCoreRowModel: getCoreRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+    });
 
     return (
-        <div className="space-y-4">
-            <header className="flex justify-between items-center">
-                <h1 className="text-xl font-bold">Minhas Tasks</h1>
+        <>
+            <DeleteTasksModal setOpen={setDeleteSelectedTask} open={deleteSelectedTask} />
 
-                <button className="btn-primary" onClick={() => redirect("/tasks/form")}>
-                    Nova Task
-                </button>
-            </header>
+            <div className="space-y-4">
+                <div className="flex gap-2">
+                    <Input placeholder="Search title" value={search} onChange={(e) => setSearch(e.target.value)} />
+                    <Input placeholder="Status" value={status} onChange={(e) => setStatus(e.target.value)} />
 
-            {/* Filtros */}
-            <div className="flex gap-2">
-                <input
-                    placeholder="Buscar por título"
-                    className="input"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
+                    {/* <DatePicker
+                    selected={createdAtStart}
+                    onChange={(date) => setCreatedAtStart(date)}
+                    placeholderText="Created From"
                 />
 
-                <select
-                    className="input"
-                    onChange={(e) => setStatus(e.target.value || undefined)}
-                >
-                    <option value="">Todas</option>
-                    <option value="pending">Pendentes</option>
-                    <option value="done">Concluídas</option>
-                </select>
+                <DatePicker
+                    selected={createdAtEnd}
+                    onChange={(date) => setCreatedAtEnd(date)}
+                    placeholderText="Created To"
+                /> */}
+
+                    <Button onClick={() => setPage(1)}>Aplicar</Button>
+                </div>
+
+                <Table>
+                    <TableHeader>
+                        {table.getHeaderGroups().map((group) => (
+                            <TableRow key={group.id}>
+                                {group.headers.map((header) => (
+                                    <TableCell
+                                        key={header.id}
+                                        className="cursor-pointer"
+                                        onClick={header.column.getToggleSortingHandler()}
+                                    >
+                                        {flexRender(
+                                            header.column.columnDef.header,
+                                            header.getContext()
+                                        )}
+                                        {{
+                                            asc: " ▲",
+                                            desc: " ▼",
+                                        }[header.column.getIsSorted() as string] ?? null}
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        ))}
+                    </TableHeader>
+
+                    <TableBody>
+                        {isFetching ? (
+                            <TableRow>
+                                <TableCell colSpan={columns.length}>
+                                    Carregando...
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow key={row.id}>
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))
+                        )}
+                    </TableBody>
+                </Table>
+
+                <div className="flex gap-2 items-center">
+                    <Button onClick={() => setPage(() => Math.max(page - 1, 1))} disabled={page === 1}>Previous</Button>
+                    <span>{`Page ${data?.page ?? 1} of ${data?.totalPages ?? 1}`}</span>
+                    <Button onClick={() => setPage(() => page + 1)} disabled={page === data?.totalPages}>Next</Button>
+                </div>
             </div>
-
-            {/* Tabela */}
-            <table className="w-full border">
-                <thead>
-                    <tr>
-                        <th>Título</th>
-                        <th>Status</th>
-                        <th>Criada em</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    {tasks?.map((task) => (
-                        <tr key={task.id}>
-                            <td>{task.title}</td>
-                            <td>{task.status}</td>
-                            <td>
-                                {new Date(task.createdAt).toLocaleDateString("pt-BR")}
-                            </td>
-                            <td className="flex gap-2">
-                                <button className="btn-secondary">Editar</button>
-                                <button
-                                    className="btn-danger"
-                                    onClick={() => deleteTask.mutate({ id: task.id })}
-                                >
-                                    Excluir
-                                </button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
+        </>
     );
 }
