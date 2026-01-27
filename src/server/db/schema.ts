@@ -27,6 +27,11 @@ export const tasks = pgTable("tasks", {
     .defaultNow()
     .$onUpdate(() => new Date()),
   deletedAt: timestamp("deleted_at"),
+  resolvedAt: timestamp("resolved_at"),
+  deadline: timestamp("deadline"),
+  priorirty: varchar("priorirty", { length: 24 })
+    .$default(() => "neutral"),
+  category: varchar("category", { length: 48 }),
 }, (t) => [
   index("tasks_user_status_idx").on(t.userId, t.status),
 ]);

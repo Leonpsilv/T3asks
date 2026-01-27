@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { registerSchema } from "~/schemas/auth";
+import { registerSchema } from "~/schemas/auth.schema";
 import { auth } from "~/server/better-auth";
 
 export interface loginDataDTO {

@@ -8,6 +8,13 @@
       "when": 1769179861814,
       "tag": "0000_primary_tables_structure",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1769457680812,
+      "tag": "0001_new_columns_for_tasks",
+      "breakpoints": true
     }
   ]
 }

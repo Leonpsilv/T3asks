@@ -8,5 +8,8 @@ export default {
   dbCredentials: {
     url: env.DATABASE_URL,
   },
+  migrations: {
+    table: "my-migrations"
+  },
   tablesFilter: ["T3asks_*"],
 } satisfies Config;

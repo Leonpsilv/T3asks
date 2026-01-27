@@ -4,7 +4,7 @@ import { loginAction } from "./actions";
 import { useState } from "react";
 import { FieldError, FieldGroup } from "~/components/ui/field";
 import { SimpleInput } from "~/app/_components/SimpleInput";
-import { loginSchema } from "~/schemas/auth";
+import { loginSchema } from "~/schemas/auth.schema";
 import { SubmitButton } from "~/app/_components/SubmitButton";
 
 export default function LoginForm() {

@@ -40,6 +40,7 @@ export function SimpleInput({
                 disabled={disable}
                 value={value}
                 required={required}
+                
             />
             {!!errorMsg && <FieldError>{errorMsg}</FieldError>}
             {!!description && <FieldDescription>

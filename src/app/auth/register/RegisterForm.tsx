@@ -5,7 +5,7 @@ import { useState } from "react";
 import { SimpleInput } from "~/app/_components/SimpleInput";
 import { SubmitButton } from "~/app/_components/SubmitButton";
 import { FieldError, FieldGroup } from "~/components/ui/field";
-import { confirmPasswordSchema, registerSchema } from "~/schemas/auth";
+import { confirmPasswordSchema, registerSchema } from "~/schemas/auth.schema";
 
 export default function LoginForm() {
     const [registerErrorMsg, setRegisterErrorMsg] = useState<string | undefined>();
