@@ -1,6 +1,6 @@
 "use client"
 
-import { Field, FieldDescription, FieldError } from "~/components/ui/field";
+import { Field, FieldDescription, FieldError, FieldLabel } from "~/components/ui/field";
 import {
     Select,
     SelectContent,
@@ -13,10 +13,12 @@ import {
 export interface ISimpleInputProps {
     options: Array<{ value: string; label: string }>;
     onChange: (props?: any) => void;
+    name: string;
     defaultValue?: string;
     errorMsg?: string | undefined;
     disable?: boolean;
     description?: string;
+    title?: string;
 }
 
 export function SimpleSelect({
@@ -26,13 +28,17 @@ export function SimpleSelect({
     errorMsg,
     disable = false,
     description,
+    title,
+    name
 }: ISimpleInputProps) {
 
     return (
         <Field>
+            {!!title && <FieldLabel htmlFor={`input-field-${name}`}>{title}</FieldLabel>}
             <Select
                 defaultValue={defaultValue}
                 onValueChange={onChange}
+                name={name}
             >
                 <SelectTrigger
                     disabled={disable}

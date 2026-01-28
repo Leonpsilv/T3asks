@@ -1,19 +1,22 @@
 "use client"
 
+import type { UseFormRegister } from "react-hook-form";
 import { Field, FieldDescription, FieldError, FieldLabel } from "~/components/ui/field"
 import { Input } from "~/components/ui/input"
 
 export interface ISimpleInputProps {
-    onChange: (props?: any) => void;
-    placeholder: string;
     name: string;
+    placeholder?: string;
+    onChange?: (props?: any) => void;
     value?: string | number | undefined;
     errorMsg?: string | undefined;
     disable?: boolean;
     required?: boolean;
-    title?: string;
+    title?: string | React.ReactNode;
     description?: string;
     type?: string;
+    register?:  UseFormRegister<any>;
+    className?: string;
 }
 
 export function SimpleInput({
@@ -27,9 +30,11 @@ export function SimpleInput({
     title,
     description,
     required = false,
+    register,
+    className
 }: ISimpleInputProps) {
     return (
-        <Field>
+        <Field className={className}>
             {!!title && <FieldLabel htmlFor={`input-field-${name}`}>{title}</FieldLabel>}
             <Input
                 name={name}
@@ -40,6 +45,7 @@ export function SimpleInput({
                 disabled={disable}
                 value={value}
                 required={required}
+                {...(register && register(name))}
                 
             />
             {!!errorMsg && <FieldError>{errorMsg}</FieldError>}

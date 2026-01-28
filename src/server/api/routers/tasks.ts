@@ -23,9 +23,6 @@ export const tasksRouter = createTRPCRouter({
         status: z.enum(statusValues as [string, ...string[]]).optional(),
         priority: z.enum(priorityValues as [string, ...string[]]).optional(),
         category: z.enum(categoryValues as [string, ...string[]]).optional(),
-        // status: z.string().max(24).optional(),
-        // priority: z.string().max(24).optional(),
-        // category: z.string().max(48).optional(),
         resolvedAt: z.date().optional(),
         deadline: z.date().optional(),
       })
@@ -53,9 +50,6 @@ export const tasksRouter = createTRPCRouter({
         status: z.enum(statusValues as [string, ...string[]]),
         priority: z.enum(priorityValues as [string, ...string[]]).optional(),
         category: z.enum(categoryValues as [string, ...string[]]).optional(),
-        // status: z.string(),
-        // priority: z.string().max(24).optional(),
-        // category: z.string().max(48).optional(),
         resolvedAt: z.date().optional(),
         deadline: z.date().optional(),
       })

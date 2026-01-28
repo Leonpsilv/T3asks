@@ -10,16 +10,14 @@ import {
     getSortedRowModel,
     useReactTable,
     type ColumnDef,
-    type OnChangeFn,
-    type Row,
-    type SortingState,
+    type Row
 } from "@tanstack/react-table";
 
+import { useRouter } from "next/navigation";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "~/components/ui/table";
 import { DeleteTasksModal } from "./_components/DeleteTasksModal";
-import { useRouter } from "next/navigation";
 
 interface ITasks {
     id: string;
@@ -175,7 +173,12 @@ export default function TasksList() {
             <DeleteTasksModal setOpen={setDeleteSelectedTask} open={deleteSelectedTask} />
 
             <div className="space-y-4 p-4 border rounded-md bg-white/10 w-[90%] max-w-[1300px] mx-auto">
-                <Button onClick={() => router.push("/tasks/form")}>Criar nova tarefa</Button>
+                <Button
+                    className="cursor-pointer"
+                    onClick={() => router.push("/tasks/form")}
+                >
+                    Criar nova tarefa
+                </Button>
                 <div className="flex gap-2">
                     <Input placeholder="Search title" value={search} onChange={(e) => setSearch(e.target.value)} />
                     <Input placeholder="Status" value={status} onChange={(e) => setStatus(e.target.value)} />
