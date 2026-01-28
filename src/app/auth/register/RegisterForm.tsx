@@ -181,7 +181,7 @@ export default function LoginForm() {
                     label="Criar conta"
                     className="w-full flex items-center justify-center gap-2 rounded-md bg-blue-600 py-2 font-semibold cursor-pointer
                                  hover:bg-blue-700 disabled:cursor-default disabled:bg-blue-400 disabled:hover:bg-blue-400"
-                    disabled={!(emailOk === "ok" && passwordOk === "ok")}
+                    disabled={!(emailOk === "ok" && passwordOk === "ok" && nameOk === "ok" && confirmPasswordOk === "ok")}
                 />
                 {!!registerErrorMsg && <FieldError>{registerErrorMsg}</FieldError>}
             </form>

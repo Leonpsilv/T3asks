@@ -4,8 +4,15 @@ import {
   createTRPCRouter,
   protectedProcedure,
 } from "~/server/api/trpc";
-import { eq, and, ilike, isNull, between, desc, sql } from "drizzle-orm";
+import { eq, and, ilike, isNull, between, desc, sql, or } from "drizzle-orm";
 import { tasks } from "~/server/db/schema";
+import { TasksStatusConfig } from "~/constants/tasksStatus";
+import { TasksCategoryConfig } from "~/constants/tasksCategory";
+import { TasksPriorityConfig } from "~/constants/tasksPriority";
+
+const statusValues = Object.values(TasksStatusConfig).map(s => s.value);
+const priorityValues = Object.values(TasksPriorityConfig).map(p => p.value);
+const categoryValues = Object.values(TasksCategoryConfig).map(c => c.value);
 
 export const tasksRouter = createTRPCRouter({
   create: protectedProcedure
@@ -13,9 +20,12 @@ export const tasksRouter = createTRPCRouter({
       z.object({
         title: z.string().min(1),
         description: z.string().optional(),
-        status: z.string().max(24).optional(),
-        priority: z.string().max(24).optional(),
-        category: z.string().max(48).optional(),
+        status: z.enum(statusValues as [string, ...string[]]).optional(),
+        priority: z.enum(priorityValues as [string, ...string[]]).optional(),
+        category: z.enum(categoryValues as [string, ...string[]]).optional(),
+        // status: z.string().max(24).optional(),
+        // priority: z.string().max(24).optional(),
+        // category: z.string().max(48).optional(),
         resolvedAt: z.date().optional(),
         deadline: z.date().optional(),
       })
@@ -27,7 +37,7 @@ export const tasksRouter = createTRPCRouter({
         userId: ctx.session.user.id,
         ...({ description: input.description }),
         ...({ status: input.status }),
-        ...({ priorirty: input.priority }),
+        ...({ priority: input.priority }),
         ...({ category: input.category }),
         ...({ resolvedAt: input.resolvedAt }),
         ...({ deadline: input.deadline }),
@@ -40,9 +50,12 @@ export const tasksRouter = createTRPCRouter({
         id: z.string(),
         title: z.string(),
         description: z.string().optional(),
-        status: z.string(),
-        priority: z.string().max(24).optional(),
-        category: z.string().max(48).optional(),
+        status: z.enum(statusValues as [string, ...string[]]),
+        priority: z.enum(priorityValues as [string, ...string[]]).optional(),
+        category: z.enum(categoryValues as [string, ...string[]]).optional(),
+        // status: z.string(),
+        // priority: z.string().max(24).optional(),
+        // category: z.string().max(48).optional(),
         resolvedAt: z.date().optional(),
         deadline: z.date().optional(),
       })
@@ -54,7 +67,7 @@ export const tasksRouter = createTRPCRouter({
           title: input.title,
           ...({ description: input.description }),
           ...({ status: input.status }),
-          ...({ priorirty: input.priority }),
+          ...({ priority: input.priority }),
           ...({ category: input.category }),
           ...({ resolvedAt: input.resolvedAt }),
           ...({ deadline: input.deadline }),
@@ -105,7 +118,7 @@ export const tasksRouter = createTRPCRouter({
       }
 
       if (input.search) {
-        conditions.push(ilike(tasks.title, `%${input.search}%`));
+        conditions.push(ilike(tasks.title, `%${input.search}%`)); // TODO: permitir search na descrição e no code também
       }
 
       const totalItemsPromise = ctx.db

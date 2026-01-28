@@ -8,6 +8,7 @@ import {
   timestamp,
   varchar
 } from "drizzle-orm/pg-core";
+import { TasksStatusConfig } from "~/constants/tasksStatus";
 
 export const tasks = pgTable("tasks", {
   id: text("id").primaryKey(),
@@ -15,7 +16,7 @@ export const tasks = pgTable("tasks", {
   title: text("title").notNull(),
   description: text("description"),
   status: varchar("status", { length: 24 })
-    .$default(() => "pending")
+    .$default(() => TasksStatusConfig.PENDING.value)
     .notNull(),
   userId: text("user_id")
     .notNull()
@@ -27,10 +28,10 @@ export const tasks = pgTable("tasks", {
     .defaultNow()
     .$onUpdate(() => new Date()),
   deletedAt: timestamp("deleted_at"),
+  startedAt: timestamp("started_at"),
   resolvedAt: timestamp("resolved_at"),
   deadline: timestamp("deadline"),
-  priorirty: varchar("priorirty", { length: 24 })
-    .$default(() => "neutral"),
+  priority: varchar("priority", { length: 24 }),
   category: varchar("category", { length: 48 }),
 }, (t) => [
   index("tasks_user_status_idx").on(t.userId, t.status),

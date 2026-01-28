@@ -15,6 +15,13 @@
       "when": 1769457680812,
       "tag": "0001_new_columns_for_tasks",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1769614758119,
+      "tag": "0002_fixing_collumns_on_tasks_table",
+      "breakpoints": true
     }
   ]
 }

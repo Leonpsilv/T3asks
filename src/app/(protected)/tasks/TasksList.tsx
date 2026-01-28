@@ -10,13 +10,16 @@ import {
     getSortedRowModel,
     useReactTable,
     type ColumnDef,
+    type OnChangeFn,
     type Row,
+    type SortingState,
 } from "@tanstack/react-table";
 
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "~/components/ui/table";
 import { DeleteTasksModal } from "./_components/DeleteTasksModal";
+import { useRouter } from "next/navigation";
 
 interface ITasks {
     id: string;
@@ -30,7 +33,7 @@ interface ITasks {
     deletedAt: Date | null;
     resolvedAt: Date | null;
     deadline: Date | null;
-    priorirty: string | null;
+    priority: string | null;
     category: string | null;
 }
 
@@ -38,6 +41,7 @@ const defaultCreatedAtStart = new Date(0);
 const defaultCreatedAtEnd = new Date("2026-02-10");
 
 export default function TasksList() {
+    const router = useRouter();
     const [page, setPage] = useState(1);
     const [pageSize] = useState(10);
     const [sorting, setSorting] = useState<{ id: string; desc: boolean }>({ id: "createdAt", desc: true });
@@ -96,7 +100,7 @@ export default function TasksList() {
             },
         },
         {
-            accessorKey: "priorirty",
+            accessorKey: "priority",
             header: "Prioridade",
             cell: ({ getValue }) => {
                 const value = getValue<string>();
@@ -170,7 +174,8 @@ export default function TasksList() {
         <>
             <DeleteTasksModal setOpen={setDeleteSelectedTask} open={deleteSelectedTask} />
 
-            <div className="space-y-4">
+            <div className="space-y-4 p-4 border rounded-md bg-white/10 w-[90%] max-w-[1300px] mx-auto">
+                <Button onClick={() => router.push("/tasks/form")}>Criar nova tarefa</Button>
                 <div className="flex gap-2">
                     <Input placeholder="Search title" value={search} onChange={(e) => setSearch(e.target.value)} />
                     <Input placeholder="Status" value={status} onChange={(e) => setStatus(e.target.value)} />

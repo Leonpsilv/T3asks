@@ -1,18 +1,22 @@
 "use client";
 
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
 import { api } from "~/trpc/react";
 
 import { createTaskSchema, type CreateTaskInput } from "~/schemas/create-task.schema";
 
 
-import { Input } from "~/components/ui/input";
-import { Button } from "~/components/ui/button";
-import { Textarea } from "~/components/ui/textarea";
-import { Select, SelectItem } from "~/components/ui/select";
 import { SimpleSelect } from "~/app/_components/SimpleSelect";
+import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
+import { Textarea } from "~/components/ui/textarea";
+
+import { configToOptions } from "~/lib/constantsToOptions";
+import { TasksStatusConfig } from "~/constants/tasksStatus";
+import { TasksPriorityConfig } from "~/constants/tasksPriority";
+import { TasksCategoryConfig } from "~/constants/tasksCategory";
 
 
 export function CreateTaskForm() {
@@ -21,7 +25,7 @@ export function CreateTaskForm() {
     const form = useForm<CreateTaskInput>({
         resolver: zodResolver(createTaskSchema),
         defaultValues: {
-            status: "pending",
+            status: TasksStatusConfig.PENDING.value,
         },
     });
 
@@ -52,33 +56,23 @@ export function CreateTaskForm() {
 
             {/* Status */}
             <SimpleSelect
-                onChange={(value) =>
-                    form.setValue("status", value)}
-                options={[
-                    { value: "pending", label: "Pendente" },
-                    { value: "holding", label: "Congelada" },
-                    { value: "in_progress", label: "Em progresso" },
-                    { value: "done", label: "Concluída" },
-                ]}
-                defaultValue="pending"
+                onChange={(value) => form.setValue("status", value)}
+                options={configToOptions(TasksStatusConfig)}
+                defaultValue={TasksStatusConfig.PENDING.value}
             />
 
             {/* Prioridade */}
             <SimpleSelect
-                onChange={(value) =>
-                    form.setValue("priority", value)}
-                options={[
-                    { value: "low", label: "Baixa" },
-                    { value: "medium", label: "Média" },
-                    { value: "high", label: "Alta" },
-                ]}
-                defaultValue="low"
+                onChange={(value) => form.setValue("priority", value)}
+                options={configToOptions(TasksPriorityConfig)}
+                defaultValue={TasksPriorityConfig.LOW.value}
             />
 
             {/* Categoria */}
-            <Input
-                placeholder="Categoria"
-                {...form.register("category")}
+            <SimpleSelect
+                onChange={(value) => form.setValue("category", value)}
+                options={configToOptions(TasksCategoryConfig)}
+                defaultValue={TasksCategoryConfig.OTHERS.value}
             />
 
             {/* Deadline */}
