@@ -28,6 +28,17 @@ export const tasksRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      let startedAt;
+
+      if (input.status !== TasksStatusConfig.PENDING.value) {
+        startedAt = new Date();
+      }
+
+      let resolvedAt = input.resolvedAt;
+      if (input.status === TasksStatusConfig.DONE.value) {
+        resolvedAt = resolvedAt ?? new Date();
+      }
+
       await ctx.db.insert(tasks).values({
         id: crypto.randomUUID(),
         title: input.title,
@@ -36,8 +47,9 @@ export const tasksRouter = createTRPCRouter({
         ...({ status: input.status }),
         ...({ priority: input.priority }),
         ...({ category: input.category }),
-        ...({ resolvedAt: input.resolvedAt }),
+        ...({ resolvedAt: resolvedAt }),
         ...({ deadline: input.deadline }),
+        ...({ startedAt: startedAt }),
       });
     }),
 
@@ -55,6 +67,32 @@ export const tasksRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      let startedAt;
+
+      const oldTask = await ctx.db
+        .select()
+        .from(tasks)
+        .where(
+          and(
+            eq(tasks.id, input.id),
+            eq(tasks.userId, ctx.session.user.id)
+          )
+        )
+        .then((r) => r[0]);
+
+      if (!oldTask) {
+        throw new Error("Task not found");
+      }
+
+      if (input.status !== TasksStatusConfig.PENDING.value && oldTask.startedAt === null) {
+        startedAt = new Date();
+      }
+
+      let resolvedAt = input.resolvedAt;
+      if (input.status === TasksStatusConfig.DONE.value && oldTask.resolvedAt === null) {
+        resolvedAt = resolvedAt ?? new Date();
+      }
+
       await ctx.db
         .update(tasks)
         .set({

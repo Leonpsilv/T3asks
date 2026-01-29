@@ -20,21 +20,7 @@ export function Modal({ open, setOpen, children, className }: IModalProps) {
             onOpenChange={setOpen}
         >
             <DialogContent showCloseButton={false} className={className ?? "sm:max-w-[425px]"}>
-                {/* <DialogHeader>
-                    <DialogTitle>Scrollable Content</DialogTitle>
-                    <DialogDescription>
-                        This is a dialog with scrollable content.
-                    </DialogDescription>
-                </DialogHeader> */}
-
                 {children}
-
-                {/* <DialogFooter>
-                    <DialogClose asChild>
-                        <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
-                    </DialogClose>
-                    <Button type="submit">Save changes</Button>
-                </DialogFooter> */}
             </DialogContent>
         </Dialog >
     )

@@ -62,7 +62,7 @@ export function SimpleDatePicker({
                         variant="outline"
                         id={`date-picker-${name}`}
                         disabled={disable}
-                        className="justify-start font-normal"
+                        className="justify-start font-normal bg-transparent cursor-pointer"
                     >
                         {date ? (
                             format(date, "PPP", {
@@ -81,7 +81,7 @@ export function SimpleDatePicker({
                         mode="single"
                         selected={date}
                         onSelect={handleSelect}
-                        initialFocus
+                        locale={ptBR} 
                     />
                 </PopoverContent>
             </Popover>
@@ -96,7 +96,7 @@ export function SimpleDatePicker({
                 <input
                     type="hidden"
                     {...register(name)}
-                    value={date?.toISOString() ?? ""}
+                    value={date?.toISOString() ?? undefined}
                 />
             )}
         </Field>

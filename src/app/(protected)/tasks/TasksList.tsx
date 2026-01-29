@@ -18,46 +18,67 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "~/components/ui/table";
 import { DeleteTasksModal } from "./_components/DeleteTasksModal";
+import { SimpleDateRangePicker } from "~/app/_components/DateRangePicker";
+import type { DateRange } from "react-day-picker";
+import { TasksCategoryConfig } from "~/constants/tasksCategory";
+import { TasksPriorityConfig } from "~/constants/tasksPriority";
+import { TasksStatusConfig } from "~/constants/tasksStatus";
+import { getLabelByValue } from "~/lib/constantsToLabels";
+import { SimpleSelect } from "~/app/_components/SimpleSelect";
+import { Edit, Trash } from "lucide-react";
+import { cn } from "~/lib/utils";
+import type { ITasks } from "~/app/_types/tasks.types";
+import { EditTasksModal } from "./_components/EditTasksModal";
 
-interface ITasks {
-    id: string;
-    code: number;
-    title: string | null;
-    description: string | null;
-    status: string | null;
-    userId: string;
-    createdAt: Date;
-    updatedAt: Date | null;
-    deletedAt: Date | null;
-    resolvedAt: Date | null;
-    deadline: Date | null;
-    priority: string | null;
-    category: string | null;
+
+
+interface ITasksListFilters {
+    page: number;
+    pageSize: number;
+    createdAtStart: Date;
+    createdAtEnd: Date;
+    search?: string;
+    status?: string;
 }
 
-const defaultCreatedAtStart = new Date(0);
-const defaultCreatedAtEnd = new Date("2026-02-10");
+const defaultCreatedAtEnd = new Date();
+const defaultCreatedAtStart = new Date(defaultCreatedAtEnd);
+defaultCreatedAtStart.setDate(defaultCreatedAtStart.getDate() - 7);
+
+const statusOptions = [
+    { value: undefined, label: "Todos os status" },
+    ...Object.values(TasksStatusConfig).map((status) => ({
+        value: status.value,
+        label: status.label,
+    })),
+];
 
 export default function TasksList() {
     const router = useRouter();
+
+    const [dateRange, setDateRange] = useState<DateRange>({
+        from: defaultCreatedAtStart,
+        to: defaultCreatedAtEnd,
+    });
+
     const [page, setPage] = useState(1);
     const [pageSize] = useState(10);
     const [sorting, setSorting] = useState<{ id: string; desc: boolean }>({ id: "createdAt", desc: true });
+
     const [search, setSearch] = useState("");
-    const [status, setStatus] = useState("");
-    const [createdAtStart, setCreatedAtStart] = useState<Date | null>(null);
-    const [createdAtEnd, setCreatedAtEnd] = useState<Date | null>(null);
+    const [status, setStatus] = useState<string | undefined>();
 
-    const [deleteSelectedTask, setDeleteSelectedTask] = useState<boolean>(false);
+    const [filters, setFilters] = useState<ITasksListFilters>({
+        page: 1,
+        pageSize: 10,
+        createdAtStart: defaultCreatedAtStart,
+        createdAtEnd: defaultCreatedAtEnd,
+    })
 
-    const queryInput = useMemo(() => ({
-        page,
-        pageSize,
-        search: search || undefined,
-        status: status || undefined,
-        createdAtStart: createdAtStart ?? defaultCreatedAtStart,
-        createdAtEnd: createdAtEnd ?? defaultCreatedAtEnd,
-    }), [page, pageSize, search, status, createdAtStart, createdAtEnd]);
+    const [editSelectedTask, setEditSelectedTask] = useState<ITasks | undefined>();
+    const [deleteSelectedTask, setDeleteSelectedTask] = useState<ITasks | undefined>();
+
+    const queryInput = useMemo(() => (filters), [filters]);
 
     const { data, isFetching } = api.tasks.list.useQuery(queryInput, {
         refetchOnMount: false,
@@ -65,16 +86,27 @@ export default function TasksList() {
         refetchOnReconnect: false,
     });
 
+    function applyFilters() {
+        setFilters({
+            page,
+            pageSize,
+            createdAtStart: dateRange.from || defaultCreatedAtStart,
+            createdAtEnd: dateRange.to || defaultCreatedAtEnd,
+            ...(search.trim().length > 0 && { search: search }),
+            ...(status && { status }),
+        });
+    }
+
     const columnHelper = useMemo(() => createColumnHelper<ITasks>(), []);
 
     const ActionButtons = useCallback(({ row }: { row: Row<ITasks> }) => {
-        const handleView = () => { };
-        const handleDelete = () => setDeleteSelectedTask(true);
+        const handleEdit = () => setEditSelectedTask(row.original);
+        const handleDelete = () => setDeleteSelectedTask(row.original);
 
         return (
             <div style={{ display: 'flex', gap: '8px' }}>
-                <button onClick={handleView}>View</button>
-                <button onClick={handleDelete}>Delete</button>
+                <button onClick={handleEdit}><Edit className={cn("size-5 cursor-pointer text-gray-300 hover:text-gray-500/50")} /></button>
+                <button onClick={handleDelete}><Trash className={cn("size-5 cursor-pointer text-red-400 hover:text-red-500/50")} /></button>
             </div>
         );
     }, []);
@@ -91,33 +123,30 @@ export default function TasksList() {
         {
             accessorKey: "status",
             header: "Status",
-            cell: ({ getValue }) => {
-                const value = getValue<string>();
-                if (!value) return "--";
-                return value ?? "--";
-            },
+            cell: ({ getValue }) => getLabelByValue(TasksStatusConfig, getValue<string>()),
         },
         {
             accessorKey: "priority",
             header: "Prioridade",
-            cell: ({ getValue }) => {
-                const value = getValue<string>();
-                if (!value) return "--";
-                return value ?? "--";
-            },
+            cell: ({ getValue }) => getLabelByValue(TasksPriorityConfig, getValue<string>()),
         },
         {
             accessorKey: "category",
             header: "Categoria",
-            cell: ({ getValue }) => {
-                const value = getValue<string>();
-                if (!value) return "--";
-                return value ?? "--";
-            },
+            cell: ({ getValue }) => getLabelByValue(TasksCategoryConfig, getValue<string>()),
         },
         {
             accessorKey: "createdAt",
             header: "Criada em",
+            cell: ({ getValue }) => {
+                const value = getValue<string>();
+                if (!value) return "--";
+                return new Date(value).toLocaleDateString();
+            },
+        },
+        {
+            accessorKey: "startedAt",
+            header: "Iniciada em",
             cell: ({ getValue }) => {
                 const value = getValue<string>();
                 if (!value) return "--";
@@ -170,7 +199,8 @@ export default function TasksList() {
 
     return (
         <>
-            <DeleteTasksModal setOpen={setDeleteSelectedTask} open={deleteSelectedTask} />
+            <DeleteTasksModal setData={setDeleteSelectedTask} data={deleteSelectedTask} />
+            <EditTasksModal setData={setEditSelectedTask} data={editSelectedTask} />
 
             <div className="space-y-4 p-4 border rounded-md bg-white/10 w-[90%] max-w-[1300px] mx-auto">
                 <Button
@@ -180,22 +210,28 @@ export default function TasksList() {
                     Criar nova tarefa
                 </Button>
                 <div className="flex gap-2">
-                    <Input placeholder="Search title" value={search} onChange={(e) => setSearch(e.target.value)} />
-                    <Input placeholder="Status" value={status} onChange={(e) => setStatus(e.target.value)} />
+                    <Input placeholder="Pesquisar" value={search} onChange={(e) => setSearch(e.target.value)} />
+                    {/* <Input placeholder="Status" value={status} onChange={(e) => setStatus(e.target.value)} /> */}
 
-                    {/* <DatePicker
-                    selected={createdAtStart}
-                    onChange={(date) => setCreatedAtStart(date)}
-                    placeholderText="Created From"
-                />
+                    <SimpleSelect
+                        name="status"
+                        value={status}
+                        onChange={(value) => {
+                            console.log({ value })
+                            setStatus(value);
+                            setPage(1);
+                        }}
+                        options={statusOptions}
+                    />
 
-                <DatePicker
-                    selected={createdAtEnd}
-                    onChange={(date) => setCreatedAtEnd(date)}
-                    placeholderText="Created To"
-                /> */}
+                    <SimpleDateRangePicker
+                        name="period"
+                        value={dateRange}
+                        onChange={setDateRange as any}
+                        dateFormat="dd/MM/yy"
+                    />
 
-                    <Button onClick={() => setPage(1)}>Aplicar</Button>
+                    <Button onClick={() => applyFilters()}>Aplicar</Button>
                 </div>
 
                 <Table>

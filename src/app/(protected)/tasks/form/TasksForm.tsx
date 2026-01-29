@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 
 import { api } from "~/trpc/react";
 
-import { createTaskSchema, type CreateTaskInput } from "~/schemas/create-task.schema";
+import { createTaskSchema, type CreateTaskInput } from "~/schemas/createTask.schema";
 
 
 import { SimpleSelect } from "~/app/_components/SimpleSelect";
@@ -48,8 +48,14 @@ export function CreateTaskForm() {
     function onSubmit(data: CreateTaskInput) {
         createTask.mutate({
             ...data,
-            ...(!!data?.deadline && { deadline: new Date(data.deadline) })
+            deadline: (!!data?.deadline && data?.deadline.toString().length) ? new Date(data.deadline) : undefined,
         });
+    }
+
+    function handleBackBtn(event: React.MouseEvent<HTMLButtonElement>) {
+        event.preventDefault();
+
+        router.back();
     }
 
     return (
@@ -123,8 +129,9 @@ export function CreateTaskForm() {
 
                 <div className="flex items-center justify-between gap-4 max-w-fit">
                     <Button
+                        variant="outline"
                         className="cursor-pointer min-w-[120px]"
-                        onClick={() => router.push("/tasks")}
+                        onClick={handleBackBtn}
                     >
                         voltar
                     </Button>

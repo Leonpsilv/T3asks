@@ -11,7 +11,7 @@ import {
 } from "~/components/ui/select";
 
 export interface ISimpleInputProps {
-    options: Array<{ value: string; label: string }>;
+    options: Array<{ value: string | undefined; label: string }>;
     onChange: (props?: any) => void;
     name: string;
     defaultValue?: string;
@@ -19,6 +19,7 @@ export interface ISimpleInputProps {
     disable?: boolean;
     description?: string;
     title?: string;
+    value?: string; 
 }
 
 export function SimpleSelect({
@@ -29,7 +30,8 @@ export function SimpleSelect({
     disable = false,
     description,
     title,
-    name
+    name,
+    value
 }: ISimpleInputProps) {
 
     return (
@@ -39,6 +41,7 @@ export function SimpleSelect({
                 defaultValue={defaultValue}
                 onValueChange={onChange}
                 name={name}
+                value={value}
             >
                 <SelectTrigger
                     disabled={disable}
@@ -50,7 +53,7 @@ export function SimpleSelect({
                 >
                     <SelectGroup>
                         {options.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
+                            <SelectItem key={option.value ?? `item-${Math.random()}`} value={option?.value as string}>
                                 {option.label}
                             </SelectItem>
                         ))}
