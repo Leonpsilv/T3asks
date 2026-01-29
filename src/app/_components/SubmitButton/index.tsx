@@ -1,24 +1,23 @@
 "use client";
 
-import { useFormStatus } from "react-dom";
 import { Spinner } from "~/components/ui/spinner";
 
 interface SubmitButtonProps {
     label: string;
+    isPending?: boolean;
 }
 
-export function SubmitButton({ label, className, ...props }: React.ComponentProps<"button"> & SubmitButtonProps) {
-    const { pending } = useFormStatus();
+export function SubmitButton({ label, className, isPending, ...props }: React.ComponentProps<"button"> & SubmitButtonProps) {
 
     return (
         <button
             type="submit"
-            disabled={pending}
+            disabled={isPending}
             className={className}
             {...props}
         >
-            {pending && <Spinner />}
-            {pending ? "Carregando..." : label}
+            {isPending && <Spinner />}
+            {isPending ? "Carregando..." : label}
         </button>
     );
 }

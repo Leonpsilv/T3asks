@@ -1,15 +1,11 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { loginSchema } from "~/schemas/auth.schema";
+import { loginSchema, type LoginInputType } from "~/schemas/login.schema";
 import { auth } from "~/server/better-auth";
 
-export interface loginDataDTO {
-    email: string;
-    password: string;
-}
 
-export async function loginAction(data: loginDataDTO) {
+export async function loginAction(data: LoginInputType) {
     const parsed = loginSchema.safeParse(data);
 
     if (!parsed.success) {
@@ -27,7 +23,7 @@ export async function loginAction(data: loginDataDTO) {
     })
 
     if (!res.ok) {
-        throw new Error("Falha ao realizar login");
+        throw new Error("Email ou senha incorretos");
     }
 
     redirect("/");

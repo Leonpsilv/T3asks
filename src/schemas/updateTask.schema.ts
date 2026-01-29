@@ -16,4 +16,4 @@ export const updateTaskSchema = z.object({
     deadline: z.date().optional(),
 });
 
-export type UpdateTaskInput = z.infer<typeof updateTaskSchema>;
+export type UpdateTaskInputType = z.infer<typeof updateTaskSchema>;

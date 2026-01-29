@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 
 import { api } from "~/trpc/react";
 
-import { createTaskSchema, type CreateTaskInput } from "~/schemas/createTask.schema";
+import { createTaskSchema, type CreateTaskInputType } from "~/schemas/createTask.schema";
 
 
 import { SimpleSelect } from "~/app/_components/SimpleSelect";
@@ -28,7 +28,7 @@ export function CreateTaskForm() {
     const router = useRouter();
     const utils = api.useUtils();
 
-    const form = useForm<CreateTaskInput>({
+    const form = useForm<CreateTaskInputType>({
         resolver: zodResolver(createTaskSchema),
         defaultValues: {
             status: TasksStatusConfig.PENDING.value,
@@ -45,7 +45,7 @@ export function CreateTaskForm() {
         },
     });
 
-    function onSubmit(data: CreateTaskInput) {
+    function onSubmit(data: CreateTaskInputType) {
         createTask.mutate({
             ...data,
             deadline: (!!data?.deadline && data?.deadline.toString().length) ? new Date(data.deadline) : undefined,

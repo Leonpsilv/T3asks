@@ -8,9 +8,8 @@ import { Button } from "~/components/ui/button";
 import { api } from "~/trpc/react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { useEffect } from "react";
-
 
 import { SimpleInput } from "~/app/_components/SimpleInput";
 import { SimpleTextarea } from "~/app/_components/SimpleTextarea";
@@ -25,7 +24,10 @@ import { configToOptions } from "~/lib/constantsToOptions";
 
 import { LoaderIcon } from "lucide-react";
 import { cn } from "~/lib/utils";
-import { updateTaskSchema, type UpdateTaskInput } from "~/schemas/updateTask.schema";
+import {
+    updateTaskSchema,
+    type UpdateTaskInputType,
+} from "~/schemas/updateTask.schema";
 
 interface IEditTasksModal {
     data: ITasks | undefined;
@@ -35,7 +37,7 @@ interface IEditTasksModal {
 export function EditTasksModal({ data, setData }: IEditTasksModal) {
     const utils = api.useUtils();
 
-    const form = useForm<UpdateTaskInput>({
+    const form = useForm<UpdateTaskInputType>({
         resolver: zodResolver(updateTaskSchema),
     });
 
@@ -49,26 +51,22 @@ export function EditTasksModal({ data, setData }: IEditTasksModal) {
     useEffect(() => {
         if (!data) return;
 
-        const oldData = {
+        form.reset({
             title: data.title ?? undefined,
             description: data.description ?? "",
             status: data.status ?? undefined,
             priority: data.priority ?? undefined,
             category: data.category ?? undefined,
             deadline: data.deadline ? new Date(data.deadline) : undefined,
-        }
-
-        console.log({ oldData })
-
-        form.reset(oldData);
+        });
     }, [data, form]);
 
-    function onSubmit(formData: UpdateTaskInput) {
+    function onSubmit(formData: UpdateTaskInputType) {
         if (!data) return;
 
         updateTask.mutate({
             id: data.id,
-            title: formData.title,
+            title: formData.title!,
             description: formData.description,
             status: formData.status!,
             priority: formData.priority,
@@ -109,59 +107,85 @@ export function EditTasksModal({ data, setData }: IEditTasksModal) {
                                 required
                             />
 
-                            <SimpleDatePicker
-                                className="min-w-fit max-w-[200px]"
+                            <Controller
+                                control={form.control}
                                 name="deadline"
-                                title="Data limite"
-                                register={form.register}
-                                value={form.getValues("deadline")}
-                                onChange={(date) =>
-                                    form.setValue("deadline", date ?? undefined)
-                                }
+                                render={({ field }) => (
+                                    <SimpleDatePicker
+                                        name="deadline"
+                                        className="min-w-fit max-w-[200px]"
+                                        title="Data limite"
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                    />
+                                )}
                             />
                         </div>
 
-                        <SimpleTextarea
+                        <Controller
+                            control={form.control}
                             name="description"
-                            title="Descrição"
-                            placeholder=""
-                            value={form.getValues("description")}
-                            onChange={(description) =>
-                                form.setValue("description", description)
-                            }
-                            register={form.register}
-                            errorMsg={form.formState.errors.description?.message}
+                            render={({ field }) => (
+                                <SimpleTextarea
+                                    {...field}
+                                    placeholder=""
+                                    name="description"
+                                    title="Descrição"
+                                    errorMsg={
+                                        form.formState.errors.description
+                                            ?.message
+                                    }
+                                />
+                            )}
                         />
 
                         <div className="flex gap-4">
-                            <SimpleSelect
+                            <Controller
+                                control={form.control}
                                 name="status"
-                                title="Status"
-                                value={form.getValues("status")}
-                                options={configToOptions(TasksStatusConfig)}
-                                onChange={(value) =>
-                                    form.setValue("status", value)
-                                }
+                                render={({ field }) => (
+                                    <SimpleSelect
+                                        title="Status"
+                                        name="status"
+                                        options={configToOptions(
+                                            TasksStatusConfig
+                                        )}
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                    />
+                                )}
                             />
 
-                            <SimpleSelect
+                            <Controller
+                                control={form.control}
                                 name="priority"
-                                title="Prioridade"
-                                value={form.getValues("priority")}
-                                options={configToOptions(TasksPriorityConfig)}
-                                onChange={(value) =>
-                                    form.setValue("priority", value)
-                                }
+                                render={({ field }) => (
+                                    <SimpleSelect
+                                        name="priority"
+                                        title="Prioridade"
+                                        options={configToOptions(
+                                            TasksPriorityConfig
+                                        )}
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                    />
+                                )}
                             />
 
-                            <SimpleSelect
+                            <Controller
+                                control={form.control}
                                 name="category"
-                                title="Categoria"
-                                value={form.getValues("category")}
-                                options={configToOptions(TasksCategoryConfig)}
-                                onChange={(value) =>
-                                    form.setValue("category", value)
-                                }
+                                render={({ field }) => (
+                                    <SimpleSelect
+                                        name="category"
+                                        title="Categoria"
+                                        options={configToOptions(
+                                            TasksCategoryConfig
+                                        )}
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                    />
+                                )}
                             />
                         </div>
                     </FieldGroup>
@@ -172,7 +196,7 @@ export function EditTasksModal({ data, setData }: IEditTasksModal) {
                             variant="outline"
                             onClick={() => setData(undefined)}
                             disabled={updateTask.isPending}
-                            className="min-w-[120px]"
+                            className="min-w-[120px] cursor-pointer"
                         >
                             Cancelar
                         </Button>
@@ -180,7 +204,7 @@ export function EditTasksModal({ data, setData }: IEditTasksModal) {
                         <Button
                             type="submit"
                             disabled={updateTask.isPending}
-                            className="min-w-[120px]"
+                            className="min-w-[120px] cursor-pointer"
                         >
                             {updateTask.isPending ? (
                                 <LoaderIcon

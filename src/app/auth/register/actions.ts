@@ -1,21 +1,10 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { registerSchema } from "~/schemas/auth.schema";
+import { registerSchema, type RegisterInputType } from "~/schemas/register.schema";
 import { auth } from "~/server/better-auth";
 
-export interface loginDataDTO {
-    email: string;
-    password: string;
-}
-
-export interface registerDataDTO {
-    email: string;
-    password: string;
-    name: string;
-}
-
-export async function registerAction(data: registerDataDTO) {
+export async function registerAction(data: RegisterInputType) {
     const parsed = registerSchema.safeParse(data)
 
     if (!parsed.success) {
@@ -33,9 +22,9 @@ export async function registerAction(data: registerDataDTO) {
         },
     });
 
-    if (!res?.response?.token) {
+    if (!res?.response?.user) {
         throw new Error("Erro ao criar usuário");
     }
 
-    redirect("/");
+    redirect("/auth/login");
 }

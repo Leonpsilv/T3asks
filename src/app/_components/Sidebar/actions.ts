@@ -1,11 +1,20 @@
 "use server";
 
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "~/server/better-auth";
 
 
 export async function logoutAction() {
-    await auth.api.signOut();
+    try {
+        const headersList = await headers();
 
-    redirect("/auth/login");
+        await auth.api.signOut({
+            headers: headersList
+        });
+
+        redirect("/auth/login");
+    } catch (error) {
+        console.log({ error })
+    }
 }

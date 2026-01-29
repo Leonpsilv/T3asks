@@ -21,21 +21,4 @@ export const loginSchema = z.object({
     password: passwordSchema,
 });
 
-export const registerSchema = z.object({
-    name: z.string().min(2, "Nome muito curto"),
-    email: z.string().email("Email inválido"),
-    password: passwordSchema,
-});
-
-export const confirmPasswordSchema = z.object({
-    password: passwordSchema,
-    confirmPassword: z.string().min(1, "Confirmação de senha é obrigatória"),
-}).superRefine(({ confirmPassword, password }, ctx) => {
-    if (confirmPassword !== password) {
-        ctx.addIssue({
-            code: "custom",
-            message: "As senhas não coincidem",
-            path: ['confirmPassword'],
-        });
-    }
-});
+export type LoginInputType = z.infer<typeof loginSchema>;

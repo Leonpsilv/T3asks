@@ -16,4 +16,4 @@ export const createTaskSchema = z.object({
     deadline: z.date().optional(),
 });
 
-export type CreateTaskInput = z.infer<typeof createTaskSchema>;
+export type CreateTaskInputType = z.infer<typeof createTaskSchema>;
