@@ -10,8 +10,12 @@ import { loginSchema, type LoginInputType } from "~/schemas/login.schema";
 import { FieldError, FieldGroup } from "~/components/ui/field";
 import { SimpleInput } from "~/app/_components/SimpleInput";
 import { SubmitButton } from "~/app/_components/SubmitButton";
+import { useAppToast } from "~/app/_contexts/toastContext";
+import { useRouter } from "next/navigation";
 
 export default function LoginForm() {
+    const toast = useAppToast();
+    const router = useRouter();
     const [loginErrorMsg, setLoginErrorMsg] = useState<string | undefined>();
 
     const form = useForm<LoginInputType>({
@@ -26,8 +30,12 @@ export default function LoginForm() {
                 email: data.email,
                 password: data.password,
             });
+
+            toast.success("Login realizado com sucesso!");
+
+            router.replace("/")
         } catch (error) {
-            console.log({ error })
+            toast.error(error);
             setLoginErrorMsg(error instanceof Error
                 ? error.message
                 : "Erro inesperado. Tente novamente em alguns minutos.");

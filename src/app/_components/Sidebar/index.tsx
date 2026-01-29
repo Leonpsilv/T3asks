@@ -6,7 +6,6 @@ import {
     SidebarFooter,
     SidebarGroup,
     SidebarGroupContent,
-    SidebarGroupLabel,
     SidebarHeader,
     SidebarMenu,
     SidebarMenuButton,
@@ -19,6 +18,7 @@ import { cn } from "~/lib/utils";
 import img from "public/icons/white_icon.svg"
 import Image from "next/image";
 import { logoutAction } from "./actions";
+import { useAppToast } from "~/app/_contexts/toastContext";
 
 interface AppSidebarProps {
     className?: string;
@@ -52,6 +52,17 @@ export function AppSidebar({
         setOpenMobile,
         isMobile,
     } = useSidebar()
+
+    const toast = useAppToast();
+
+    async function handleLogout() {
+        try {
+            await logoutAction();
+            toast.success("Deslogado com sucesso!");
+        } catch (error) {
+            toast.error("Erro inesperado ao deslogar!", error);
+        }
+    }
 
     return (
         <Sidebar
@@ -95,7 +106,7 @@ export function AppSidebar({
                     </SidebarGroupContent>
                 </SidebarGroup>
                 <SidebarFooter className="absolute bottom-0 w-full mb-10 hover:bg-[#0c0625] p-2 rounded-md cursor-pointer">
-                    <LogOutIcon className="m-0 mx-auto" onClick={async () => await logoutAction()}/>
+                    <LogOutIcon className="m-0 mx-auto" onClick={async () => await handleLogout()} />
                 </SidebarFooter>
             </SidebarContent>
         </Sidebar>

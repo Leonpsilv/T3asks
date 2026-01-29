@@ -4,6 +4,8 @@ import { type Metadata } from "next";
 import { Geist } from "next/font/google";
 
 import { TRPCReactProvider } from "~/trpc/react";
+import { Toaster } from "~/components/ui/sonner";
+import { ToastProvider } from "./_contexts/toastContext";
 
 export const metadata: Metadata = {
   title: "T3ASKS",
@@ -23,9 +25,12 @@ export default function RootLayout({
     <html lang="en" className={`${geist.variable}`}>
       <body>
         <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#e2f6ae] to-[#050b01]">
-          <TRPCReactProvider>
-            {children}
-          </TRPCReactProvider>
+          <ToastProvider>
+            <Toaster position="top-center" />
+            <TRPCReactProvider>
+              {children}
+            </TRPCReactProvider>
+          </ToastProvider>
         </main>
       </body>
     </html>

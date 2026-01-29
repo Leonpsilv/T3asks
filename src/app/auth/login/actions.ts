@@ -25,6 +25,4 @@ export async function loginAction(data: LoginInputType) {
     if (!res.ok) {
         throw new Error("Email ou senha incorretos");
     }
-
-    redirect("/");
 }

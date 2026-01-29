@@ -10,8 +10,13 @@ import { registerSchema, type RegisterInputType } from "~/schemas/register.schem
 import { SimpleInput } from "~/app/_components/SimpleInput";
 import { SubmitButton } from "~/app/_components/SubmitButton";
 import { FieldError, FieldGroup } from "~/components/ui/field";
+import { useRouter } from "next/navigation";
+import { useAppToast } from "~/app/_contexts/toastContext";
 
 export default function RegisterForm() {
+    const toast = useAppToast();
+    const router = useRouter();
+
     const [registerErrorMsg, setRegisterErrorMsg] = useState<string | undefined>();
 
     const {
@@ -27,8 +32,11 @@ export default function RegisterForm() {
             setRegisterErrorMsg(undefined);
 
             await registerAction(data);
+
+            toast.success("Cadastro realizado com sucesso!");
+            router.replace("/auth/login")
         } catch (error) {
-            console.log({ error })
+            toast.error(error);
             setRegisterErrorMsg(
                 error instanceof Error
                     ? error.message
@@ -60,7 +68,7 @@ export default function RegisterForm() {
                     />
 
                     <SimpleInput
-                         register={register}
+                        register={register}
                         name="email"
                         type="email"
                         title="Email"
@@ -70,7 +78,7 @@ export default function RegisterForm() {
                     />
 
                     <SimpleInput
-                         register={register}
+                        register={register}
                         name="password"
                         type="password"
                         title="Senha"
@@ -80,7 +88,7 @@ export default function RegisterForm() {
                     />
 
                     <SimpleInput
-                         register={register}
+                        register={register}
                         name="confirmPassword"
                         type="password"
                         title="Confirme a senha"

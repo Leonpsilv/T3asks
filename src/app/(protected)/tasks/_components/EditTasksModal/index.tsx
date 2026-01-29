@@ -28,6 +28,7 @@ import {
     updateTaskSchema,
     type UpdateTaskInputType,
 } from "~/schemas/updateTask.schema";
+import { useAppToast } from "~/app/_contexts/toastContext";
 
 interface IEditTasksModal {
     data: ITasks | undefined;
@@ -36,6 +37,7 @@ interface IEditTasksModal {
 
 export function EditTasksModal({ data, setData }: IEditTasksModal) {
     const utils = api.useUtils();
+    const toast = useAppToast();
 
     const form = useForm<UpdateTaskInputType>({
         resolver: zodResolver(updateTaskSchema),
@@ -44,6 +46,7 @@ export function EditTasksModal({ data, setData }: IEditTasksModal) {
     const updateTask = api.tasks.update.useMutation({
         onSuccess: async () => {
             await utils.tasks.list.invalidate();
+            toast.success("Tarefa alterada com sucesso!");
             setData(undefined);
         },
     });
@@ -62,17 +65,21 @@ export function EditTasksModal({ data, setData }: IEditTasksModal) {
     }, [data, form]);
 
     function onSubmit(formData: UpdateTaskInputType) {
-        if (!data) return;
+        try {
+            if (!data) throw new Error("Falha ao obter dados da tarefa!");
 
-        updateTask.mutate({
-            id: data.id,
-            title: formData.title!,
-            description: formData.description,
-            status: formData.status!,
-            priority: formData.priority,
-            category: formData.category,
-            deadline: formData.deadline,
-        });
+            updateTask.mutate({
+                id: data.id,
+                title: formData.title!,
+                description: formData.description,
+                status: formData.status!,
+                priority: formData.priority,
+                category: formData.category,
+                deadline: formData.deadline,
+            });
+        } catch (error) {
+            toast.error(error)
+        }
     }
 
     return (

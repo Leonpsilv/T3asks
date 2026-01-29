@@ -34,9 +34,9 @@ export const tasksRouter = createTRPCRouter({
         startedAt = new Date();
       }
 
-      let resolvedAt = input.resolvedAt;
+      let resolvedAt;
       if (input.status === TasksStatusConfig.DONE.value) {
-        resolvedAt = resolvedAt ?? new Date();
+        resolvedAt = new Date();
       }
 
       await ctx.db.insert(tasks).values({
@@ -67,8 +67,6 @@ export const tasksRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      let startedAt;
-
       const oldTask = await ctx.db
         .select()
         .from(tasks)
@@ -84,13 +82,14 @@ export const tasksRouter = createTRPCRouter({
         throw new Error("Task not found");
       }
 
-      if (input.status !== TasksStatusConfig.PENDING.value && oldTask.startedAt === null) {
+      let startedAt;
+      if (input.status !== TasksStatusConfig.PENDING.value && !oldTask.startedAt) {
         startedAt = new Date();
       }
 
-      let resolvedAt = input.resolvedAt;
-      if (input.status === TasksStatusConfig.DONE.value && oldTask.resolvedAt === null) {
-        resolvedAt = resolvedAt ?? new Date();
+      let resolvedAt;
+      if (input.status === TasksStatusConfig.DONE.value && !oldTask.resolvedAt) {
+        resolvedAt = new Date();
       }
 
       await ctx.db
@@ -101,8 +100,9 @@ export const tasksRouter = createTRPCRouter({
           ...({ status: input.status }),
           ...({ priority: input.priority }),
           ...({ category: input.category }),
-          ...({ resolvedAt: input.resolvedAt }),
           ...({ deadline: input.deadline }),
+          ...({ startedAt }),
+          ...({ resolvedAt }),
         })
         .where(
           and(

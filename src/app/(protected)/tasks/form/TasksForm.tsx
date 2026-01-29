@@ -22,10 +22,12 @@ import { TasksStatusConfig } from "~/constants/tasksStatus";
 import { configToOptions } from "~/lib/constantsToOptions";
 import { cn } from "~/lib/utils";
 import { SimpleDatePicker } from "~/app/_components/DatePicker";
+import { useAppToast } from "~/app/_contexts/toastContext";
 
 
 export function CreateTaskForm() {
     const router = useRouter();
+    const toast = useAppToast();
     const utils = api.useUtils();
 
     const form = useForm<CreateTaskInputType>({
@@ -40,16 +42,22 @@ export function CreateTaskForm() {
     const createTask = api.tasks.create.useMutation({
         onSuccess: async () => {
             await utils.tasks.list.invalidate();
+            toast.success("Tarefa cadastrada com sucesso!");
             form.reset();
-            router.push("/tasks");
+            router.replace("/tasks");
+
         },
     });
 
     function onSubmit(data: CreateTaskInputType) {
-        createTask.mutate({
-            ...data,
-            deadline: (!!data?.deadline && data?.deadline.toString().length) ? new Date(data.deadline) : undefined,
-        });
+        try {
+            createTask.mutate({
+                ...data,
+                deadline: (!!data?.deadline && data?.deadline.toString().length) ? new Date(data.deadline) : undefined,
+            });
+        } catch (error) {
+            toast.error(error);
+        }
     }
 
     function handleBackBtn(event: React.MouseEvent<HTMLButtonElement>) {

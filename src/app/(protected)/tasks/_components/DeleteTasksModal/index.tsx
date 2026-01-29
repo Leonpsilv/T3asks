@@ -8,6 +8,7 @@ import { Button } from "~/components/ui/button";
 import { api } from "~/trpc/react";
 import { LoaderIcon } from "lucide-react";
 import { cn } from "~/lib/utils";
+import { useAppToast } from "~/app/_contexts/toastContext";
 
 interface IDeleteTasksModal {
     data: ITasks | undefined;
@@ -16,20 +17,26 @@ interface IDeleteTasksModal {
 
 export function DeleteTasksModal({ data, setData }: IDeleteTasksModal) {
     const utils = api.useUtils();
+    const toast = useAppToast();
 
     const deleteTask = api.tasks.delete.useMutation({
         onSuccess: async () => {
+            toast.success("Tarefa excluída com sucesso!");
             await utils.tasks.list.invalidate();
             setData(undefined);
         },
     });
 
     function handleDelete() {
-        if (!data) return;
+        try {
+            if (!data) throw new Error("Falha ao obter informações da tarefa!");
 
-        deleteTask.mutate({
-            id: data.id,
-        });
+            deleteTask.mutate({
+                id: data.id,
+            });
+        } catch (error) {
+            toast.error(error)
+        }
     }
 
     return (

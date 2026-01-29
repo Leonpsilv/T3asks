@@ -6,15 +6,9 @@ import { auth } from "~/server/better-auth";
 
 
 export async function logoutAction() {
-    try {
-        const headersList = await headers();
+    const headersList = await headers();
 
-        await auth.api.signOut({
-            headers: headersList
-        });
-
-        redirect("/auth/login");
-    } catch (error) {
-        console.log({ error })
-    }
+    await auth.api.signOut({
+        headers: headersList
+    });
 }

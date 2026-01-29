@@ -25,6 +25,4 @@ export async function registerAction(data: RegisterInputType) {
     if (!res?.response?.user) {
         throw new Error("Erro ao criar usuário");
     }
-
-    redirect("/auth/login");
 }
