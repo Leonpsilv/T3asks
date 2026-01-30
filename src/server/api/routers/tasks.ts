@@ -4,7 +4,7 @@ import {
   createTRPCRouter,
   protectedProcedure,
 } from "~/server/api/trpc";
-import { eq, and, ilike, isNull, between, desc, sql, or } from "drizzle-orm";
+import { eq, and, ilike, isNull, between, desc, sql, or, isNotNull, lt } from "drizzle-orm";
 import { tasks } from "~/server/db/schema";
 import { TasksStatusConfig } from "~/constants/tasksStatus";
 import { TasksCategoryConfig } from "~/constants/tasksCategory";
@@ -179,4 +179,72 @@ export const tasksRouter = createTRPCRouter({
         pageSize: input.pageSize,
       };
     }),
+
+  dashboard: protectedProcedure.query(async ({ ctx }) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const userCondition = and(
+      eq(tasks.userId, ctx.session.user.id),
+      isNull(tasks.deletedAt)
+    );
+
+    // 🔹 Em andamento
+    const inProgressPromise = ctx.db
+      .select()
+      .from(tasks)
+      .where(
+        and(
+          userCondition,
+          eq(tasks.status, TasksStatusConfig.IN_PROGRESS.value)
+        )
+      )
+      .orderBy(desc(tasks.createdAt))
+      .limit(5);
+
+    // 🔹 Concluídas recentemente
+    const completedPromise = ctx.db
+      .select()
+      .from(tasks)
+      .where(
+        and(
+          userCondition,
+          eq(tasks.status, TasksStatusConfig.DONE.value)
+        )
+      )
+      .orderBy(desc(tasks.resolvedAt))
+      .limit(5);
+
+    // 🔹 Atrasadas
+    const delayedPromise = ctx.db
+      .select()
+      .from(tasks)
+      .where(
+        and(
+          userCondition,
+          isNull(tasks.resolvedAt),
+          isNotNull(tasks.deadline), 
+          lt(tasks.deadline, today)
+        )
+      )
+      .orderBy(desc(tasks.deadline))
+      .limit(5);
+
+    const [
+      inProgress,
+      completed,
+      delayed
+    ] = await Promise.all([
+      inProgressPromise,
+      completedPromise,
+      delayedPromise
+    ]);
+
+    return {
+      inProgress,
+      completed,
+      delayed,
+    };
+  })
+
 });

@@ -13,5 +13,5 @@ export const TasksStatusConfig = {
     }
 } as const;
 
-export type TaskStatus =
+export type TaskStatusType =
     typeof TasksStatusConfig[keyof typeof TasksStatusConfig]["value"];

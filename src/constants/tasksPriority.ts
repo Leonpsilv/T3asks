@@ -17,5 +17,5 @@ export const TasksPriorityConfig = {
 } as const;
 
 
-export type TaskPriority =
+export type TaskPriorityType =
     typeof TasksPriorityConfig[keyof typeof TasksPriorityConfig]["value"];
