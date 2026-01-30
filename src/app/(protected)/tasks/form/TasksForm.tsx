@@ -44,7 +44,7 @@ export function CreateTaskForm() {
             await utils.tasks.list.invalidate();
             toast.success("Tarefa cadastrada com sucesso!");
             form.reset();
-            router.replace("/tasks");
+            router.back();
 
         },
     });

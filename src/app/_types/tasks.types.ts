@@ -8,6 +8,7 @@ export interface ITasks {
     createdAt: Date;
     updatedAt: Date | null;
     deletedAt: Date | null;
+    startedAt: Date | null;
     resolvedAt: Date | null;
     deadline: Date | null;
     priority: string | null;
