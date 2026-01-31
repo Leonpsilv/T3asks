@@ -13,6 +13,7 @@ import { MetricsCard } from "../_components/UserMetricsCards";
 import { useAuth } from "../_contexts/authContext";
 import { TaskActions } from "../_components/TasksTable/TaskActions";
 import { ViewTasksModal } from "../_components/ViewTasksModal";
+import LiveClock from "../_components/LiveClock";
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -20,24 +21,7 @@ export default function DashboardPage() {
     const [viewSelectedTask, setViewSelectedTask] = useState<ITasks | undefined>()
 
     const { data, isLoading } = api.tasks.dashboard.useQuery();
-
-    const { inProgress, completed, delayed, metrics } = data || { inProgress: [], done: [], late: [] };
-
-    const now = new Date();
-
-    const greeting = useMemo(() => {
-        return now.toLocaleDateString("pt-BR", {
-            weekday: "long",
-            day: "2-digit",
-            month: "long",
-            year: "numeric",
-        });
-    }, [now]);
-
-    const time = now.toLocaleTimeString("pt-BR", {
-        hour: "2-digit",
-        minute: "2-digit",
-    });
+    const { inProgress, completed, delayed, metrics } = data || { inProgress: [], completed: [], delayed: [], metrics: {} };
 
     const actionsColumn: ITasksTableColumn<ITasks> = {
         key: "actions",
@@ -132,9 +116,7 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-[60px] font-semibold">Bem-vindo, {user.name}! 👋</h1>
-                        <p className="text-[30px] text-muted-foreground capitalize">
-                            {greeting} · {time}
-                        </p>
+                        <LiveClock />
                     </div>
 
                     <Button onClick={() => router.push("/tasks/form")} className="gap-2 cursor-pointer">

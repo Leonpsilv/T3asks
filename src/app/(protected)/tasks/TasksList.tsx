@@ -25,10 +25,11 @@ import { TasksPriorityConfig } from "~/constants/tasksPriority";
 import { TasksStatusConfig } from "~/constants/tasksStatus";
 import { getLabelByValue } from "~/lib/constantsToLabels";
 import { SimpleSelect } from "~/app/_components/SimpleSelect";
-import { Edit, Trash } from "lucide-react";
+import { Edit, Trash, View } from "lucide-react";
 import { cn } from "~/lib/utils";
 import type { ITasks } from "~/app/_types/tasks.types";
 import { EditTasksModal } from "../../_components/EditTasksModal";
+import { ViewTasksModal } from "~/app/_components/ViewTasksModal";
 
 
 
@@ -77,6 +78,7 @@ export default function TasksList() {
 
     const [editSelectedTask, setEditSelectedTask] = useState<ITasks | undefined>();
     const [deleteSelectedTask, setDeleteSelectedTask] = useState<ITasks | undefined>();
+    const [viewSelectedTask, setViewSelectedTask] = useState<ITasks | undefined>()
 
     const queryInput = useMemo(() => (filters), [filters]);
 
@@ -100,12 +102,15 @@ export default function TasksList() {
     const columnHelper = useMemo(() => createColumnHelper<ITasks>(), []);
 
     const ActionButtons = useCallback(({ row }: { row: Row<ITasks> }) => {
-        const handleEdit = () => setEditSelectedTask(row.original);
-        const handleDelete = () => setDeleteSelectedTask(row.original);
+        const task = row.original;
+        const handleEdit = () => setEditSelectedTask(task);
+        const handleDelete = () => setDeleteSelectedTask(task);
+        const handleView = () => setViewSelectedTask(task);
 
         return (
-            <div style={{ display: 'flex', gap: '8px' }}>
-                <button onClick={handleEdit}><Edit className={cn("size-5 cursor-pointer text-gray-300 hover:text-gray-500/50")} /></button>
+            <div className="flex gap-[8px] items-center">
+                <button onClick={handleView}><View className={cn("size-5 cursor-pointer text-gray-700 hover:text-gray-500/50")} /></button>
+                {(task.status !== TasksStatusConfig.DONE.value) && <button onClick={handleEdit}><Edit className={cn("size-5 cursor-pointer text-gray-300 hover:text-gray-500/50")} /></button>}
                 <button onClick={handleDelete}><Trash className={cn("size-5 cursor-pointer text-red-400 hover:text-red-500/50")} /></button>
             </div>
         );
@@ -201,6 +206,7 @@ export default function TasksList() {
         <>
             <DeleteTasksModal setData={setDeleteSelectedTask} data={deleteSelectedTask} />
             <EditTasksModal setData={setEditSelectedTask} data={editSelectedTask} />
+            <ViewTasksModal data={viewSelectedTask} setData={setViewSelectedTask} />
 
             <div className="space-y-4 p-4 border rounded-md bg-white/10 w-[90%] max-w-[1300px] mx-auto">
                 <Button

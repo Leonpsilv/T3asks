@@ -2,10 +2,12 @@ export function InfoItem({
     label,
     value,
     multiline,
+    className,
 }: {
     label: string;
     value?: React.ReactNode;
     multiline?: boolean;
+    className?: string;
 }) {
     return (
         <div className="flex flex-col gap-1">
@@ -14,7 +16,7 @@ export function InfoItem({
             </span>
 
             <span
-                className={`text-sm font-medium ${multiline ? "whitespace-pre-wrap" : ""
+                className={className ?? `text-sm font-medium ${multiline ? "whitespace-pre-wrap" : ""
                     }`}
             >
                 {value || "—"}

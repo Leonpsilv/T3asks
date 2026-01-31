@@ -8,10 +8,11 @@ import { Button } from "~/components/ui/button";
 import { FieldGroup } from "~/components/ui/field";
 
 import { getLabelByValue } from "~/lib/constantsToLabels";
-import { TasksStatusConfig } from "~/constants/tasksStatus";
+import { TasksStatusConfig, type TaskStatusType } from "~/constants/tasksStatus";
 import { TasksPriorityConfig } from "~/constants/tasksPriority";
 import { TasksCategoryConfig } from "~/constants/tasksCategory";
 import { InfoItem } from "../InfoItem";
+import { getColorByStatus } from "~/lib/getColorByStatus";
 
 interface IViewTasksModal {
     data: ITasks | undefined;
@@ -30,12 +31,12 @@ export function ViewTasksModal({ data, setData }: IViewTasksModal) {
             <div className="p-10 space-y-6 max-w-[900px]">
                 <DialogHeader>
                     <DialogTitle className="text-lg">
-                        Visualizar task
+                        <strong>{data.code} — {data.title}</strong>
                     </DialogTitle>
 
-                    <DialogDescription>
-                        Detalhes da task <strong>{data.title}</strong>
-                    </DialogDescription>
+                    {!!data.description?.length && <DialogDescription>
+                        {data.description}
+                    </DialogDescription>}
                 </DialogHeader>
 
                 <FieldGroup>
@@ -44,19 +45,9 @@ export function ViewTasksModal({ data, setData }: IViewTasksModal) {
                         <InfoItem
                             label="Status"
                             value={getLabelByValue(TasksStatusConfig, data.status)}
+                            className={`text-sm font-medium ${getColorByStatus(data.status as TaskStatusType)}`}
                         />
                     </div>
-
-                    <InfoItem
-                        label="Título"
-                        value={data.title}
-                    />
-
-                    <InfoItem
-                        label="Descrição"
-                        value={data.description}
-                        multiline
-                    />
 
                     <div className="grid grid-cols-3 gap-6">
                         <InfoItem
