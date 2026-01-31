@@ -2,35 +2,26 @@
 
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { TasksStatusConfig, type TaskStatusType } from "~/constants/tasksStatus";
 import { getLabelByValue } from "~/lib/constantsToLabels";
 import { api } from "~/trpc/react";
 import { TasksTable, type ITasksTableColumn } from "../_components/TasksTable";
 import type { ITasks } from "../_types/tasks.types";
-
-// Tipagem simples para o dashboard
-type Task = {
-    id: string;
-    title: string;
-    status: TaskStatusType;
-    deadline?: Date;
-    createdAt: Date;
-};
-
-interface DashboardProps {
-    tasks: Task[];
-    onCreateTask: () => void;
-}
+import { MetricsCard } from "../_components/UserMetricsCards";
+import { useAuth } from "../_contexts/authContext";
+import { TaskActions } from "../_components/TasksTable/TaskActions";
+import { ViewTasksModal } from "../_components/ViewTasksModal";
 
 export default function DashboardPage() {
     const router = useRouter();
+    const { user } = useAuth();
+    const [viewSelectedTask, setViewSelectedTask] = useState<ITasks | undefined>()
 
     const { data, isLoading } = api.tasks.dashboard.useQuery();
 
-    console.log({ data })
-    const { inProgress, completed, delayed } = data || { inProgress: [], done: [], late: [] };
+    const { inProgress, completed, delayed, metrics } = data || { inProgress: [], done: [], late: [] };
 
     const now = new Date();
 
@@ -47,6 +38,17 @@ export default function DashboardPage() {
         hour: "2-digit",
         minute: "2-digit",
     });
+
+    const actionsColumn: ITasksTableColumn<ITasks> = {
+        key: "actions",
+        label: "Ações",
+        render: (_, row) => (
+            <TaskActions
+                task={row}
+                onView={setViewSelectedTask}
+            />
+        ),
+    };
 
     const defaultColumns: ITasksTableColumn<ITasks>[] = [
         {
@@ -78,6 +80,7 @@ export default function DashboardPage() {
                 return typed ? typed.toLocaleDateString("pt-BR") : "—"
             }
         },
+        actionsColumn
     ]
 
     const startedColumns: ITasksTableColumn<ITasks>[] = [
@@ -98,6 +101,7 @@ export default function DashboardPage() {
                 return typed ? typed.toLocaleDateString("pt-BR") : "—"
             }
         },
+        actionsColumn
     ]
 
     const completedColumns: ITasksTableColumn<ITasks>[] = [
@@ -118,52 +122,89 @@ export default function DashboardPage() {
                 return typed ? typed.toLocaleDateString("pt-BR") : "—"
             }
         },
+        actionsColumn
     ]
 
     return (
-        <div className="w-full h-[calc(100%-40px)] p-[20px] m-[20px] rounded-xl bg-gray-700/25 p-8 text-white shadow-xl">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-[60px] font-semibold">Bem-vindo 👋</h1>
-                    <p className="text-[30px] text-muted-foreground capitalize">
-                        {greeting} · {time}
-                    </p>
+        <>
+            <ViewTasksModal data={viewSelectedTask} setData={setViewSelectedTask} />
+            <div className="w-full h-[calc(100%-40px)] p-[20px] m-[20px] rounded-xl bg-gray-700/25 p-8 text-white shadow-xl">
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-[60px] font-semibold">Bem-vindo, {user.name}! 👋</h1>
+                        <p className="text-[30px] text-muted-foreground capitalize">
+                            {greeting} · {time}
+                        </p>
+                    </div>
+
+                    <Button onClick={() => router.push("/tasks/form")} className="gap-2 cursor-pointer">
+                        <Plus className="h-4 w-4" />
+                        Nova tarefa
+                    </Button>
                 </div>
 
-                <Button onClick={() => router.push("/tasks/form")} className="gap-2 cursor-pointer">
-                    <Plus className="h-4 w-4" />
-                    Nova tarefa
-                </Button>
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 mt-[10px] mb-[10px]">
+                    <MetricsCard
+                        title="Resumo dos últimos 30 dias"
+                        items={[
+                            {
+                                label: "Tasks criadas",
+                                value: metrics?.createdLast30Days,
+                            },
+                            {
+                                label: "Tasks concluídas",
+                                value: metrics?.completedLast30Days,
+                                valueClassName: "text-green-500",
+                            },
+                        ]}
+                    />
+
+                    <MetricsCard
+                        title="Informações importantes"
+                        items={[
+                            {
+                                label: "Tasks atrasadas",
+                                value: metrics?.delayedNotCompleted,
+                                valueClassName: "text-red-500",
+                            },
+                            {
+                                label: "Tasks congeladas",
+                                value: metrics?.holdingNotCompleted,
+                                valueClassName: "text-blue-500",
+                            },
+                        ]}
+                    />
+                </div>
+
+                <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                    <TasksTable
+                        title="Em andamento"
+                        tasks={inProgress}
+                        emptyLabel="Nenhuma tarefa em andamento"
+                        columns={startedColumns}
+                        defaultBodyCellsClassName={"text-center font-semibold"}
+                        defaultHeaderCellsClassName={"text-center"}
+                    />
+
+                    <TasksTable
+                        title="Concluídas recentemente"
+                        tasks={completed}
+                        emptyLabel="Nenhuma tarefa concluída"
+                        columns={completedColumns}
+                        defaultBodyCellsClassName={"text-center font-semibold"}
+                        defaultHeaderCellsClassName={"text-center"}
+                    />
+
+                    <TasksTable
+                        title="Últimas atrasadas"
+                        tasks={delayed}
+                        emptyLabel="Nenhuma tarefa atrasada 🎉"
+                        columns={delayedColumns}
+                        defaultBodyCellsClassName={"text-center font-semibold"}
+                        defaultHeaderCellsClassName={"text-center"}
+                    />
+                </div>
             </div>
-
-            <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-                <TasksTable
-                    title="Em andamento"
-                    tasks={inProgress}
-                    emptyLabel="Nenhuma tarefa em andamento"
-                    columns={startedColumns}
-                    defaultBodyCellsClassName={"text-center font-semibold"}
-                    defaultHeaderCellsClassName={"text-center"}
-                />
-
-                <TasksTable
-                    title="Concluídas recentemente"
-                    tasks={completed}
-                    emptyLabel="Nenhuma tarefa concluída"
-                    columns={completedColumns}
-                    defaultBodyCellsClassName={"text-center font-semibold"}
-                    defaultHeaderCellsClassName={"text-center"}
-                />
-
-                <TasksTable
-                    title="Últimas atrasadas"
-                    tasks={delayed}
-                    emptyLabel="Nenhuma tarefa atrasada 🎉"
-                    columns={delayedColumns}
-                    defaultBodyCellsClassName={"text-center font-semibold"}
-                    defaultHeaderCellsClassName={"text-center"}
-                />
-            </div>
-        </div>
+        </>
     );
 }

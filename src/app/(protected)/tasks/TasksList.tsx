@@ -17,7 +17,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Table, TableBody, TableCell, TableHeader, TableRow } from "~/components/ui/table";
-import { DeleteTasksModal } from "./_components/DeleteTasksModal";
+import { DeleteTasksModal } from "../../_components/DeleteTasksModal";
 import { SimpleDateRangePicker } from "~/app/_components/DateRangePicker";
 import type { DateRange } from "react-day-picker";
 import { TasksCategoryConfig } from "~/constants/tasksCategory";
@@ -28,7 +28,7 @@ import { SimpleSelect } from "~/app/_components/SimpleSelect";
 import { Edit, Trash } from "lucide-react";
 import { cn } from "~/lib/utils";
 import type { ITasks } from "~/app/_types/tasks.types";
-import { EditTasksModal } from "./_components/EditTasksModal";
+import { EditTasksModal } from "../../_components/EditTasksModal";
 
 
 

@@ -4,7 +4,7 @@ import {
   createTRPCRouter,
   protectedProcedure,
 } from "~/server/api/trpc";
-import { eq, and, ilike, isNull, between, desc, sql, or, isNotNull, lt } from "drizzle-orm";
+import { eq, and, ilike, isNull, between, desc, sql, or, isNotNull, lt, gt } from "drizzle-orm";
 import { tasks } from "~/server/db/schema";
 import { TasksStatusConfig } from "~/constants/tasksStatus";
 import { TasksCategoryConfig } from "~/constants/tasksCategory";
@@ -184,12 +184,14 @@ export const tasksRouter = createTRPCRouter({
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
+    const last30Days = new Date();
+    last30Days.setDate(today.getDate() - 30);
+
     const userCondition = and(
       eq(tasks.userId, ctx.session.user.id),
       isNull(tasks.deletedAt)
     );
 
-    // 🔹 Em andamento
     const inProgressPromise = ctx.db
       .select()
       .from(tasks)
@@ -202,7 +204,6 @@ export const tasksRouter = createTRPCRouter({
       .orderBy(desc(tasks.createdAt))
       .limit(5);
 
-    // 🔹 Concluídas recentemente
     const completedPromise = ctx.db
       .select()
       .from(tasks)
@@ -215,7 +216,6 @@ export const tasksRouter = createTRPCRouter({
       .orderBy(desc(tasks.resolvedAt))
       .limit(5);
 
-    // 🔹 Atrasadas
     const delayedPromise = ctx.db
       .select()
       .from(tasks)
@@ -223,27 +223,86 @@ export const tasksRouter = createTRPCRouter({
         and(
           userCondition,
           isNull(tasks.resolvedAt),
-          isNotNull(tasks.deadline), 
+          isNotNull(tasks.deadline),
           lt(tasks.deadline, today)
         )
       )
       .orderBy(desc(tasks.deadline))
       .limit(5);
 
+    const createdLast30DaysPromise = ctx.db
+      .select({ count: sql<number>`count(*)` })
+      .from(tasks)
+      .where(
+        and(
+          userCondition,
+          gt(tasks.createdAt, last30Days)
+        )
+      );
+
+    const completedLast30DaysPromise = ctx.db
+      .select({ count: sql<number>`count(*)` })
+      .from(tasks)
+      .where(
+        and(
+          userCondition,
+          eq(tasks.status, TasksStatusConfig.DONE.value),
+          isNotNull(tasks.resolvedAt),
+          gt(tasks.createdAt, last30Days)
+        )
+      );
+
+    const delayedNotCompletedPromise = ctx.db
+      .select({ count: sql<number>`count(*)` })
+      .from(tasks)
+      .where(
+        and(
+          userCondition,
+          isNull(tasks.resolvedAt),
+          isNotNull(tasks.deadline),
+          lt(tasks.deadline, today)
+        )
+      );
+
+    const holdingNotCompletedPromise = ctx.db
+      .select({ count: sql<number>`count(*)` })
+      .from(tasks)
+      .where(
+        and(
+          userCondition,
+          isNull(tasks.resolvedAt),
+          eq(tasks.status, TasksStatusConfig.HOLDING.value)
+        )
+      );
+
     const [
       inProgress,
       completed,
-      delayed
+      delayed,
+      createdLast30Days,
+      completedLast30Days,
+      delayedNotCompleted,
+      holdingNotCompleted
     ] = await Promise.all([
       inProgressPromise,
       completedPromise,
-      delayedPromise
+      delayedPromise,
+      createdLast30DaysPromise,
+      completedLast30DaysPromise,
+      delayedNotCompletedPromise,
+      holdingNotCompletedPromise
     ]);
 
     return {
       inProgress,
       completed,
       delayed,
+      metrics: {
+        createdLast30Days: Number(createdLast30Days[0]?.count ?? 0),
+        completedLast30Days: Number(completedLast30Days[0]?.count ?? 0),
+        delayedNotCompleted: Number(delayedNotCompleted[0]?.count ?? 0),
+        holdingNotCompleted: Number(holdingNotCompleted[0]?.count ?? 0),
+      },
     };
   })
 

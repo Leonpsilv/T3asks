@@ -15,7 +15,7 @@ import {
 } from "~/components/ui/table";
 
 export type ITasksTableColumn<T> = {
-    key: keyof T;
+    key: keyof T | string;
     label: string;
     headerClassName?: string;
     bodyClassName?: string;
@@ -40,7 +40,7 @@ export function TasksTable({
     defaultHeaderCellsClassName = "text-left"
 }: TasksTableProps) {
     return (
-        <Card>
+        <Card className="bg-white/60">
             <CardHeader className="pb-2">
                 <CardTitle className="text-base">{title}</CardTitle>
             </CardHeader>
@@ -67,7 +67,7 @@ export function TasksTable({
                             {tasks?.map((task) => (
                                 <TableRow key={task.id}>
                                     {columns.map((col) => {
-                                        const value = task[col.key];
+                                        const value = task[col.key as keyof ITasks];
 
                                         return (
                                             <TableCell
