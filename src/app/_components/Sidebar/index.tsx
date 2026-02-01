@@ -37,7 +37,7 @@ const items = [
     },
     {
         title: "Usuários",
-        url: "#",
+        url: "/users",
         icon: <User2Icon size={20} />,
     },
 ]

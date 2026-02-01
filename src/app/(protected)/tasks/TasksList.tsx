@@ -54,6 +54,13 @@ const statusOptions = [
     })),
 ];
 
+const DEFAULT_FILTERS: ITasksListFilters = {
+    page: 1,
+    pageSize: 10,
+    createdAtStart: defaultCreatedAtStart,
+    createdAtEnd: defaultCreatedAtEnd,
+};
+
 export default function TasksList() {
     const router = useRouter();
 
@@ -69,12 +76,7 @@ export default function TasksList() {
     const [search, setSearch] = useState("");
     const [status, setStatus] = useState<string | undefined>();
 
-    const [filters, setFilters] = useState<ITasksListFilters>({
-        page: 1,
-        pageSize: 10,
-        createdAtStart: defaultCreatedAtStart,
-        createdAtEnd: defaultCreatedAtEnd,
-    })
+    const [filters, setFilters] = useState<ITasksListFilters>(DEFAULT_FILTERS);
 
     const [editSelectedTask, setEditSelectedTask] = useState<ITasks | undefined>();
     const [deleteSelectedTask, setDeleteSelectedTask] = useState<ITasks | undefined>();
@@ -82,21 +84,31 @@ export default function TasksList() {
 
     const queryInput = useMemo(() => (filters), [filters]);
 
-    const { data, isFetching } = api.tasks.list.useQuery(queryInput, {
-        refetchOnMount: false,
-        refetchOnWindowFocus: false,
-        refetchOnReconnect: false,
-    });
+    const { data, isFetching } = api.tasks.list.useQuery(queryInput);
 
     function applyFilters() {
+        setPage(1);
         setFilters({
-            page,
+            page: 1,
             pageSize,
             createdAtStart: dateRange.from || defaultCreatedAtStart,
             createdAtEnd: dateRange.to || defaultCreatedAtEnd,
-            ...(search.trim().length > 0 && { search: search }),
+            ...(search.trim().length > 0 && { search }),
             ...(status && { status }),
         });
+    }
+
+    function clearFilters() {
+        setSearch("");
+        setStatus(undefined);
+        setPage(1);
+
+        setDateRange({
+            from: defaultCreatedAtStart,
+            to: defaultCreatedAtEnd,
+        });
+
+        setFilters(DEFAULT_FILTERS);
     }
 
     const columnHelper = useMemo(() => createColumnHelper<ITasks>(), []);
@@ -217,7 +229,6 @@ export default function TasksList() {
                 </Button>
                 <div className="flex gap-2">
                     <Input placeholder="Pesquisar" value={search} onChange={(e) => setSearch(e.target.value)} />
-                    {/* <Input placeholder="Status" value={status} onChange={(e) => setStatus(e.target.value)} /> */}
 
                     <SimpleSelect
                         name="status"
@@ -237,7 +248,16 @@ export default function TasksList() {
                         dateFormat="dd/MM/yy"
                     />
 
-                    <Button onClick={() => applyFilters()}>Aplicar</Button>
+                    <Button className="cursor-pointer"  onClick={applyFilters}>Aplicar</Button>
+
+                    <Button
+                        variant="outline"
+                        onClick={clearFilters}
+                        disabled={!search && !status}
+                        className="cursor-pointer" 
+                    >
+                        Limpar
+                    </Button>
                 </div>
 
                 <Table>
