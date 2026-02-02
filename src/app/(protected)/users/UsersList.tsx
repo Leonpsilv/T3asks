@@ -12,6 +12,7 @@ import { Table, TableBody, TableCell, TableHeader, TableRow } from "~/components
 import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { api } from "~/trpc/react";
+import { ArrowBigLeft, ArrowBigRight } from "lucide-react";
 
 interface IUserTasksSummary {
     userId: string;
@@ -36,7 +37,6 @@ const DEFAULT_FILTERS: IUsersListFilters = {
 
 
 export default function UsersList() {
-    const [page, setPage] = useState(1);
     const [pageSize] = useState(10);
     const [search, setSearch] = useState("");
 
@@ -47,7 +47,6 @@ export default function UsersList() {
     const { data, isFetching } = api.users.list.useQuery(queryInput);
 
     function applyFilters() {
-        setPage(1);
         setFilters({
             page: 1,
             pageSize,
@@ -94,9 +93,15 @@ export default function UsersList() {
 
     function clearFilters() {
         setSearch("");
-        setPage(1);
         setFilters(DEFAULT_FILTERS);
     }
+
+    const goToPage = (newPage: number) => {
+        setFilters((prev) => ({
+            ...prev,
+            page: newPage,
+        }));
+    };
 
 
     return (
@@ -112,7 +117,7 @@ export default function UsersList() {
                     variant="outline"
                     onClick={clearFilters}
                     disabled={!search}
-                    className="cursor-pointer" 
+                    className="cursor-pointer"
                 >
                     Limpar
                 </Button>
@@ -162,29 +167,21 @@ export default function UsersList() {
             {/* ⏭ Paginação */}
             <div className="flex gap-2 items-center justify-end">
                 <Button
-                    onClick={() => {
-                        const newPage = Math.max(page - 1, 1);
-                        setPage(newPage);
-                        setFilters((f) => ({ ...f, page: newPage }));
-                    }}
-                    disabled={page === 1}
+                    onClick={() => goToPage(Math.max(filters.page - 1, 1))}
+                    disabled={filters.page === 1}
                 >
-                    Previous
+                    <ArrowBigLeft />
                 </Button>
 
                 <span>
-                    Page {data?.page ?? 1} of {data?.totalPages ?? 1}
+                    Página {data?.page ?? 1} de {data?.totalPages ?? 1}
                 </span>
 
                 <Button
-                    onClick={() => {
-                        const newPage = page + 1;
-                        setPage(newPage);
-                        setFilters((f) => ({ ...f, page: newPage }));
-                    }}
-                    disabled={page === data?.totalPages}
+                    onClick={() => goToPage(filters.page + 1)}
+                    disabled={filters.page === data?.totalPages}
                 >
-                    Next
+                    <ArrowBigRight />
                 </Button>
             </div>
         </div>

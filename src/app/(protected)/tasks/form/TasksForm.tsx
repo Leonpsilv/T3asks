@@ -41,11 +41,10 @@ export function CreateTaskForm() {
 
     const createTask = api.tasks.create.useMutation({
         onSuccess: async () => {
-            await utils.tasks.list.invalidate();
             toast.success("Tarefa cadastrada com sucesso!");
             form.reset();
-            router.back();
-
+            await utils.tasks.invalidate()
+            router.push("/tasks");
         },
     });
 

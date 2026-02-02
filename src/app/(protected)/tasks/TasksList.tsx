@@ -25,7 +25,7 @@ import { TasksPriorityConfig } from "~/constants/tasksPriority";
 import { TasksStatusConfig } from "~/constants/tasksStatus";
 import { getLabelByValue } from "~/lib/constantsToLabels";
 import { SimpleSelect } from "~/app/_components/SimpleSelect";
-import { Edit, Trash, View } from "lucide-react";
+import { ArrowBigLeft, ArrowBigRight, Edit, Trash, View } from "lucide-react";
 import { cn } from "~/lib/utils";
 import type { ITasks } from "~/app/_types/tasks.types";
 import { EditTasksModal } from "../../_components/EditTasksModal";
@@ -69,7 +69,6 @@ export default function TasksList() {
         to: defaultCreatedAtEnd,
     });
 
-    const [page, setPage] = useState(1);
     const [pageSize] = useState(10);
     const [sorting, setSorting] = useState<{ id: string; desc: boolean }>({ id: "createdAt", desc: true });
 
@@ -87,7 +86,6 @@ export default function TasksList() {
     const { data, isFetching } = api.tasks.list.useQuery(queryInput);
 
     function applyFilters() {
-        setPage(1);
         setFilters({
             page: 1,
             pageSize,
@@ -101,7 +99,6 @@ export default function TasksList() {
     function clearFilters() {
         setSearch("");
         setStatus(undefined);
-        setPage(1);
 
         setDateRange({
             from: defaultCreatedAtStart,
@@ -110,6 +107,14 @@ export default function TasksList() {
 
         setFilters(DEFAULT_FILTERS);
     }
+
+    const goToPage = (newPage: number) => {
+        setFilters((prev) => ({
+            ...prev,
+            page: newPage,
+        }));
+    };
+
 
     const columnHelper = useMemo(() => createColumnHelper<ITasks>(), []);
 
@@ -234,9 +239,7 @@ export default function TasksList() {
                         name="status"
                         value={status}
                         onChange={(value) => {
-                            console.log({ value })
                             setStatus(value);
-                            setPage(1);
                         }}
                         options={statusOptions}
                     />
@@ -248,13 +251,13 @@ export default function TasksList() {
                         dateFormat="dd/MM/yy"
                     />
 
-                    <Button className="cursor-pointer"  onClick={applyFilters}>Aplicar</Button>
+                    <Button className="cursor-pointer" onClick={applyFilters}>Aplicar</Button>
 
                     <Button
                         variant="outline"
                         onClick={clearFilters}
                         disabled={!search && !status}
-                        className="cursor-pointer" 
+                        className="cursor-pointer"
                     >
                         Limpar
                     </Button>
@@ -306,9 +309,21 @@ export default function TasksList() {
                 </Table>
 
                 <div className="flex gap-2 items-center">
-                    <Button onClick={() => setPage(() => Math.max(page - 1, 1))} disabled={page === 1}>Previous</Button>
-                    <span>{`Page ${data?.page ?? 1} of ${data?.totalPages ?? 1}`}</span>
-                    <Button onClick={() => setPage(() => page + 1)} disabled={page === data?.totalPages}>Next</Button>
+                    <Button
+                        onClick={() => goToPage(Math.max(filters.page - 1, 1))}
+                        disabled={filters.page === 1}
+                        className="cursor-pointer"
+                    >
+                        <ArrowBigLeft />
+                    </Button>
+                    <span>{`Página ${data?.page ?? 1} de ${data?.totalPages ?? 1}`}</span>
+                    <Button
+                        onClick={() => goToPage(filters.page + 1)}
+                        disabled={filters.page === data?.totalPages}
+                        className="cursor-pointer"
+                    >
+                        <ArrowBigRight />
+                    </Button>
                 </div>
             </div>
         </>

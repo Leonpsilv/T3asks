@@ -25,12 +25,12 @@ export default function RootLayout({
     <html lang="en" className={`${geist.variable}`}>
       <body>
         <main className="flex min-h-screen items-center justify-center bg-gradient-to-b from-[#e2f6ae] to-[#050b01]">
-          <ToastProvider>
-            <Toaster position="top-center" />
-            <TRPCReactProvider>
+          <TRPCReactProvider>
+            <ToastProvider>
+              <Toaster position="top-center" />
               {children}
-            </TRPCReactProvider>
-          </ToastProvider>
+            </ToastProvider>
+          </TRPCReactProvider>
         </main>
       </body>
     </html>
