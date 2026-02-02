@@ -24,7 +24,7 @@ export function MetricsCard({
         ?
         <MetricsCardSkeleton />
         :
-        <Card className="w-full bg-white/60">
+        <Card className="w-full bg-white/45">
           <CardHeader>
             <CardTitle className="text-lg">
               {title}
@@ -37,7 +37,7 @@ export function MetricsCard({
                 key={item.label}
                 className="flex flex-col"
               >
-                <span className="text-sm text-muted-foreground">
+                <span className="text-sm text-muted-foreground !text-gray-700">
                   {item.label}
                 </span>
                 <span

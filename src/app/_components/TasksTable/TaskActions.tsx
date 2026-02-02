@@ -16,7 +16,7 @@ export function TaskActions({
             <button onClick={() => onView(task)}>
                 <View
                     className={cn(
-                        "size-5 cursor-pointer text-gray-700 hover:text-gray-500/50"
+                        "size-5 cursor-pointer text-blue-600 hover:text-blue-600/50"
                     )}
                 />
             </button>

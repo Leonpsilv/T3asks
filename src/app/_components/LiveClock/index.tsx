@@ -26,7 +26,7 @@ const LiveClock = memo(() => {
     });
 
     return (
-        <p className="text-[30px] text-muted-foreground capitalize">
+        <p className="text-[30px] text-muted-foreground capitalize !text-gray-400">
             {greeting} · {time}
         </p>
     );

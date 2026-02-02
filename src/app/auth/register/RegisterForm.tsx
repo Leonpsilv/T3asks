@@ -71,8 +71,8 @@ export default function RegisterForm() {
                         register={register}
                         name="email"
                         type="email"
-                        title="Email"
-                        placeholder="Email"
+                        title="E-mail"
+                        placeholder="Informe o seu e-mail"
                         errorMsg={errors.email?.message}
                         required
                     />
@@ -82,7 +82,7 @@ export default function RegisterForm() {
                         name="password"
                         type="password"
                         title="Senha"
-                        placeholder="Senha"
+                        placeholder="Digite uma senha"
                         errorMsg={errors.password?.message}
                         required
                     />
@@ -101,8 +101,8 @@ export default function RegisterForm() {
                 <SubmitButton
                     label="Criar conta"
                     isPending={isSubmitting}
-                    className="w-full flex items-center justify-center gap-2 rounded-md bg-blue-600 py-2 font-semibold
-                     hover:bg-blue-700 disabled:cursor-default disabled:bg-blue-400 cursor-pointer"
+                    className="w-full flex items-center justify-center gap-2 rounded-md bg-green-400/50 py-2 font-semibold
+            hover:bg-green-700/50 disabled:cursor-default disabled:bg-green-400/20 cursor-pointer"
                 />
 
                 {!!registerErrorMsg && <FieldError>{registerErrorMsg}</FieldError>}

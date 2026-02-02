@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 
 import { api } from "~/trpc/react";
 
@@ -66,7 +66,7 @@ export function CreateTaskForm() {
     }
 
     return (
-        <div className="space-y-4 p-4 border rounded-md bg-white/10 w-[90%] max-w-[1300px] mx-auto">
+        <div className="space-y-4 p-4 bg-white/15 shadow-xl rounded-xl w-[90%] max-w-[1300px] mx-auto">
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FieldGroup>
                     <div className="flex align-center gap-4">
@@ -79,22 +79,19 @@ export function CreateTaskForm() {
                             register={form.register}
                             required
                         />
-
-                        <SimpleDatePicker
-                            className="min-w-fit max-w-[200px]"
+                        <Controller
+                            control={form.control}
                             name="deadline"
-                            title="Data limite"
-                            placeholder="Escolha uma data"
-                            errorMsg={form.formState.errors.deadline?.message}
-                            register={form.register}
-                            onChange={(date) =>
-                                form.setValue(
-                                    "deadline",
-                                    date
-                                        ? new Date(date)
-                                        : undefined
-                                )
-                            }
+                            render={({ field }) => (
+                                <SimpleDatePicker
+                                    name="deadline"
+                                    title="Data limite"
+                                    placeholder="Escolha uma data"
+                                    value={field.value}
+                                    errorMsg={form.formState.errors.deadline?.message}
+                                    onChange={field.onChange}
+                                />
+                            )}
                         />
                     </div>
 
@@ -144,7 +141,7 @@ export function CreateTaskForm() {
                     </Button>
 
                     <Button
-                        className="cursor-pointer min-w-[120px]"
+                        className="cursor-pointer min-w-[120px] bg-green-400/50 hover:bg-green-700/50 disabled:cursor-default disabled:bg-green-400/20"
                         type="submit"
                         disabled={createTask.isPending}
                     >

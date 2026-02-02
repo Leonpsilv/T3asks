@@ -112,20 +112,20 @@ export default function DashboardPage() {
     return (
         <>
             <ViewTasksModal data={viewSelectedTask} setData={setViewSelectedTask} />
-            <div className="w-full h-[calc(100%-40px)] p-[20px] m-[20px] rounded-xl bg-gray-700/25 p-8 text-white shadow-xl">
+            <div className="w-full h-[calc(100%-40px)] p-[20px] m-[20px] rounded-xl bg-white/15 p-8 text-white shadow-xl">
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-[60px] font-semibold">Bem-vindo, {user.name}! 👋</h1>
                         <LiveClock />
                     </div>
 
-                    <Button onClick={() => router.push("/tasks/form")} className="gap-2 cursor-pointer">
+                    <Button onClick={() => router.push("/tasks/form")} className="gap-2 cursor-pointer bg-green-400/50 hover:bg-green-700/50 disabled:cursor-default disabled:bg-green-400/20">
                         <Plus className="h-4 w-4" />
                         Nova tarefa
                     </Button>
                 </div>
 
-                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 mt-[10px] mb-[10px]">
+                <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 mt-[20px] mb-[20px]">
                     <MetricsCard
                         isLoading={isLoading}
                         title="Resumo dos últimos 30 dias"

@@ -60,8 +60,8 @@ export default function LoginForm() {
                     <SimpleInput
                         name="email"
                         type="email"
-                        placeholder="Email"
-                        title="Email"
+                        placeholder="Informe o seu e-mail"
+                        title="E-mail"
                         register={form.register}
                         errorMsg={form.formState.errors.email?.message}
                         required
@@ -70,7 +70,7 @@ export default function LoginForm() {
                     <SimpleInput
                         name="password"
                         type="password"
-                        placeholder="Senha"
+                        placeholder="Informe a sua senha"
                         title="Senha"
                         register={form.register}
                         errorMsg={form.formState.errors.password?.message}

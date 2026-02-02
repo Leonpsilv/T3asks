@@ -36,7 +36,7 @@ export function SimpleSelect({
 
     return (
         <Field>
-            {!!title && <FieldLabel htmlFor={`input-field-${name}`}>{title}</FieldLabel>}
+            {!!title && <FieldLabel htmlFor={`input-field-${name}`} className="text-white">{title}</FieldLabel>}
             <Select
                 defaultValue={defaultValue}
                 onValueChange={onChange}
@@ -45,6 +45,7 @@ export function SimpleSelect({
             >
                 <SelectTrigger
                     disabled={disable}
+                    className="cursor-pointer"
                 >
                     <SelectValue />
                 </SelectTrigger>

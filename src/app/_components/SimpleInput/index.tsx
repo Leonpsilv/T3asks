@@ -35,8 +35,9 @@ export function SimpleInput({
 }: ISimpleInputProps) {
     return (
         <Field className={className}>
-            {!!title && <FieldLabel htmlFor={`input-field-${name}`}>{title}</FieldLabel>}
+            {!!title && <FieldLabel htmlFor={`input-field-${name}`} className="text-white">{title}</FieldLabel>}
             <Input
+                className="!placeholder-gray-300 text-white"
                 name={name}
                 id={`input-field-${name}`}
                 type={type}

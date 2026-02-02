@@ -41,6 +41,8 @@ interface ITasksListFilters {
     createdAtEnd: Date;
     search?: string;
     status?: string;
+    orderBy?: string;
+    orderDirection?: "asc" | "desc";
 }
 
 const defaultCreatedAtEnd = new Date();
@@ -60,6 +62,8 @@ const DEFAULT_FILTERS: ITasksListFilters = {
     pageSize: 10,
     createdAtStart: defaultCreatedAtStart,
     createdAtEnd: defaultCreatedAtEnd,
+    orderBy: "createdAt",
+    orderDirection: "desc",
 };
 
 export default function TasksList() {
@@ -88,6 +92,7 @@ export default function TasksList() {
 
     function applyFilters() {
         setFilters({
+            ...filters,
             page: 1,
             pageSize,
             createdAtStart: dateRange.from || defaultCreatedAtStart,
@@ -127,7 +132,7 @@ export default function TasksList() {
 
         return (
             <div className="flex gap-[8px] items-center">
-                <button onClick={handleView}><View className={cn("size-5 cursor-pointer text-gray-700 hover:text-gray-500/50")} /></button>
+                <button onClick={handleView}><View className={cn("size-5 cursor-pointer text-blue-300 hover:text-blue-300/50")} /></button>
                 {(task.status !== TasksStatusConfig.DONE.value) && <button onClick={handleEdit}><Edit className={cn("size-5 cursor-pointer text-gray-300 hover:text-gray-500/50")} /></button>}
                 <button onClick={handleDelete}><Trash className={cn("size-5 cursor-pointer text-red-400 hover:text-red-500/50")} /></button>
             </div>
@@ -147,16 +152,19 @@ export default function TasksList() {
             accessorKey: "status",
             header: "Status",
             cell: ({ getValue }) => getLabelByValue(TasksStatusConfig, getValue<string>()),
+            enableSorting: false,
         },
         {
             accessorKey: "priority",
             header: "Prioridade",
             cell: ({ getValue }) => getLabelByValue(TasksPriorityConfig, getValue<string>()),
+            enableSorting: false,
         },
         {
             accessorKey: "category",
             header: "Categoria",
             cell: ({ getValue }) => getLabelByValue(TasksCategoryConfig, getValue<string>()),
+            enableSorting: false,
         },
         {
             accessorKey: "createdAt",
@@ -197,28 +205,41 @@ export default function TasksList() {
         columnHelper.display({
             id: 'actions',
             header: 'Ações',
+            enableSorting: false,
             cell: ({ row }) => <ActionButtons row={row} />,
         }),
     ], [columnHelper, ActionButtons]);
 
     const tasks = useMemo(() => data?.items ?? [], [data?.items]);
 
-    const tableSorting = useMemo(() => [{ id: sorting.id, desc: sorting.desc }], [sorting.id, sorting.desc]);
-
     const table = useReactTable({
         data: tasks,
         columns,
         state: {
-            sorting: tableSorting,
+            sorting: [{ id: sorting.id, desc: sorting.desc }],
         },
-        onSortingChange: (newSort: any) => {
-            if (newSort.length > 0) {
-                setSorting({ id: newSort[0].id, desc: newSort[0].desc });
-            }
+        manualSorting: true,
+        onSortingChange: (updaterFn: any) => {
+            const updater = updaterFn()
+            const nextSort = updater[0];
+
+            if (!nextSort) return;
+
+            setSorting({
+                id: nextSort.id,
+                desc: nextSort.desc,
+            });
+
+            setFilters((prev) => ({
+                ...prev,
+                page: 1,
+                sortBy: nextSort.id,
+                sortOrder: nextSort.desc ? "desc" : "asc",
+            }));
         },
         getCoreRowModel: getCoreRowModel(),
-        getSortedRowModel: getSortedRowModel(),
     });
+
 
     return (
         <>
@@ -226,15 +247,15 @@ export default function TasksList() {
             <EditTasksModal setData={setEditSelectedTask} data={editSelectedTask} />
             <ViewTasksModal data={viewSelectedTask} setData={setViewSelectedTask} />
 
-            <div className="space-y-4 p-4 border rounded-md bg-white/10 w-[90%] max-w-[1300px] mx-auto">
+            <div className="space-y-4 p-4 rounded-xl shadow-xl bg-white/15 w-[90%] max-w-[1300px] mx-auto">
                 <Button
-                    className="cursor-pointer"
+                    className="cursor-pointer bg-green-400/50 hover:bg-green-700/50 disabled:cursor-default disabled:bg-green-400/20"
                     onClick={() => router.push("/tasks/form")}
                 >
                     Criar nova tarefa
                 </Button>
                 <div className="flex gap-2">
-                    <Input placeholder="Pesquisar" value={search} onChange={(e) => setSearch(e.target.value)} />
+                    <Input placeholder="Pesquisar" className="!placeholder-gray-300 text-white" value={search} onChange={(e) => setSearch(e.target.value)} />
 
                     <SimpleSelect
                         name="status"
@@ -252,7 +273,12 @@ export default function TasksList() {
                         dateFormat="dd/MM/yy"
                     />
 
-                    <Button className="cursor-pointer" onClick={applyFilters}>Aplicar</Button>
+                    <Button
+                        className="cursor-pointer bg-green-400/50 hover:bg-green-700/50 disabled:cursor-default disabled:bg-green-400/20"
+                        onClick={applyFilters}
+                    >
+                        Aplicar
+                    </Button>
 
                     <Button
                         variant="outline"
@@ -271,8 +297,15 @@ export default function TasksList() {
                                 {group.headers.map((header) => (
                                     <TableCell
                                         key={header.id}
-                                        className="cursor-pointer"
-                                        onClick={header.column.getToggleSortingHandler()}
+                                        className={cn(
+                                            "text-white",
+                                            header.column.getCanSort() && "cursor-pointer select-none"
+                                        )}
+                                        onClick={
+                                            header.column.getCanSort()
+                                                ? header.column.getToggleSortingHandler()
+                                                : undefined
+                                        }
                                     >
                                         {flexRender(
                                             header.column.columnDef.header,
@@ -303,7 +336,7 @@ export default function TasksList() {
                             table.getRowModel().rows.map((row) => (
                                 <TableRow key={row.id}>
                                     {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
+                                        <TableCell className="text-white" key={cell.id}>
                                             {flexRender(
                                                 cell.column.columnDef.cell,
                                                 cell.getContext()
@@ -316,14 +349,13 @@ export default function TasksList() {
                             <TableRow>
                                 <TableCell
                                     colSpan={columns.length}
-                                    className="text-center text-muted-foreground"
+                                    className="text-center text-muted-foreground text-white"
                                 >
                                     Nenhuma tarefa encontrada
                                 </TableCell>
                             </TableRow>
                         )}
                     </TableBody>
-
                 </Table>
 
                 <div className="flex gap-2 items-center">
@@ -334,7 +366,7 @@ export default function TasksList() {
                     >
                         <ArrowBigLeft />
                     </Button>
-                    <span>{`Página ${data?.page ?? 1} de ${data?.totalPages ?? 1}`}</span>
+                    <span className="text-white">{`Página ${data?.page ?? 1} de ${data?.totalPages ?? 1}`}</span>
                     <Button
                         onClick={() => goToPage(filters.page + 1)}
                         disabled={filters.page === data?.totalPages}

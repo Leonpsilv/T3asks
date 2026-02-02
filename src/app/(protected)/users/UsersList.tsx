@@ -106,14 +106,20 @@ export default function UsersList() {
 
 
     return (
-        <div className="space-y-4 p-4 border rounded-md bg-white/10 w-[90%] max-w-[1100px] mx-auto">
+        <div className="space-y-4 p-4 rounded-xl shadow-xl bg-white/15 w-[90%] max-w-[1300px] mx-auto">
             <div className="flex gap-2">
                 <Input
                     placeholder="Pesquisar usuário"
+                    className="!placeholder-gray-300 text-white"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />
-                <Button className="cursor-pointer" onClick={applyFilters}>Aplicar</Button>
+                <Button
+                    className="cursor-pointer bg-green-400/50 hover:bg-green-700/50 disabled:cursor-default disabled:bg-green-400/20"
+                    onClick={applyFilters}
+                >
+                    Aplicar
+                </Button>
                 <Button
                     variant="outline"
                     onClick={clearFilters}
@@ -130,7 +136,7 @@ export default function UsersList() {
                     {table.getHeaderGroups().map((group) => (
                         <TableRow key={group.id}>
                             {group.headers.map((header) => (
-                                <TableCell key={header.id}>
+                                <TableCell className="text-white" key={header.id}>
                                     {flexRender(
                                         header.column.columnDef.header,
                                         header.getContext()
@@ -156,7 +162,7 @@ export default function UsersList() {
                         table.getRowModel().rows.map((row) => (
                             <TableRow key={row.id}>
                                 {row.getVisibleCells().map((cell) => (
-                                    <TableCell key={cell.id}>
+                                    <TableCell className="text-white" key={cell.id}>
                                         {flexRender(
                                             cell.column.columnDef.cell,
                                             cell.getContext()
@@ -169,9 +175,9 @@ export default function UsersList() {
                         <TableRow>
                             <TableCell
                                 colSpan={columns.length}
-                                className="text-center text-muted-foreground"
+                                className="text-center text-muted-foreground text-white"
                             >
-                                Nenhuma tarefa encontrada
+                                Nenhum usuário encontrada
                             </TableCell>
                         </TableRow>
                     )}
@@ -188,7 +194,7 @@ export default function UsersList() {
                     <ArrowBigLeft />
                 </Button>
 
-                <span>
+                <span className="text-white">
                     Página {data?.page ?? 1} de {data?.totalPages ?? 1}
                 </span>
 

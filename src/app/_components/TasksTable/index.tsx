@@ -51,7 +51,7 @@ export function TasksTable({
                     columnsCount={columns.length}
                 />
                 :
-                <Card className="bg-white/60">
+                <Card className="bg-white/45">
                     <CardHeader className="pb-2">
                         <CardTitle className="text-base">{title}</CardTitle>
                     </CardHeader>

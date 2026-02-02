@@ -39,13 +39,14 @@ export function SimpleTextarea({
   return (
     <Field>
       {!!title && (
-        <FieldLabel htmlFor={`textarea-field-${name}`}>
+        <FieldLabel  className="!text-white" htmlFor={`textarea-field-${name}`}>
           {title}
         </FieldLabel>
       )}
 
       <Textarea
         id={`textarea-field-${name}`}
+        className="!placeholder-gray-300 text-white"
         placeholder={placeholder}
         disabled={disable}
         required={required}

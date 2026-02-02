@@ -28,17 +28,17 @@ const items = [
     {
         title: "Home",
         url: "/",
-        icon: <Home size={20} />,
+        icon: <Home />,
     },
     {
         title: "Tarefas",
         url: "/tasks",
-        icon: <Calendar size={20} />,
+        icon: <Calendar />,
     },
     {
         title: "Usuários",
         url: "/users",
-        icon: <User2Icon size={20} />,
+        icon: <User2Icon />,
     },
 ]
 
@@ -68,6 +68,7 @@ export function AppSidebar({
         <Sidebar
             collapsible="icon"
             className={cn(
+                "!border-r-0",
                 className,
             )}
         >
@@ -81,9 +82,9 @@ export function AppSidebar({
                             <Image
                                 src={img}
                                 alt="Logo em formato de folha"
-                                className="w-[33px]"
+                                className="!w-[33px]"
                             />
-                            {open &&
+                            {!!open &&
                                 <span className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#e0e1d7] to-[#dff8a7]">
                                     T3asks
                                 </span>}
@@ -94,10 +95,10 @@ export function AppSidebar({
                         <SidebarMenu>
                             {items.map((item) => (
                                 <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton asChild>
+                                    <SidebarMenuButton asChild size={"lg"} className="[&>svg]:size-5">
                                         <a href={item.url} className="text-lg3">
                                             {item.icon}
-                                            <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#e0e1d7] to-[#dff8a7]">{item.title}</span>
+                                            {open && <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#e0e1d7] to-[#dff8a7]">{item.title}</span>}
                                         </a>
                                     </SidebarMenuButton>
                                 </SidebarMenuItem>
@@ -105,8 +106,11 @@ export function AppSidebar({
                         </SidebarMenu>
                     </SidebarGroupContent>
                 </SidebarGroup>
-                <SidebarFooter className="absolute bottom-0 w-full mb-10 hover:bg-[#0c0625] p-2 rounded-md cursor-pointer">
-                    <LogOutIcon className="m-0 mx-auto" onClick={async () => await handleLogout()} />
+                <SidebarFooter className="w-full absolute bottom-0 mb-10 flex items-center justify-center">
+                    <div className=" w-[calc(100%-20px)] hover:bg-[#0c0625] p-2 rounded-md cursor-pointer">
+                        <LogOutIcon className="m-0 mx-auto" onClick={async () => await handleLogout()} />
+
+                    </div>
                 </SidebarFooter>
             </SidebarContent>
         </Sidebar>

@@ -24,7 +24,6 @@ export interface ISimpleDatePickerProps {
     onChange?: (date?: Date) => void;
     errorMsg?: string;
     disable?: boolean;
-    register?: UseFormRegister<any>;
     className?: string;
 }
 
@@ -37,7 +36,6 @@ export function SimpleDatePicker({
     onChange,
     errorMsg,
     disable = false,
-    register,
     className
 }: ISimpleDatePickerProps) {
     const [date, setDate] = React.useState<Date | undefined>(value);
@@ -50,7 +48,7 @@ export function SimpleDatePicker({
     return (
         <Field className={className}>
             {!!title && (
-                <FieldLabel htmlFor={`date-picker-${name}`}>
+                <FieldLabel className="text-white" htmlFor={`date-picker-${name}`}>
                     {title}
                 </FieldLabel>
             )}
@@ -62,7 +60,7 @@ export function SimpleDatePicker({
                         variant="outline"
                         id={`date-picker-${name}`}
                         disabled={disable}
-                        className="justify-start font-normal bg-transparent cursor-pointer"
+                        className="justify-start font-normal bg-transparent cursor-pointer !placeholder-gray-300 text-white"
                     >
                         {date ? (
                             format(date, "PPP", {
@@ -89,15 +87,6 @@ export function SimpleDatePicker({
             {!!errorMsg && <FieldError>{errorMsg}</FieldError>}
             {!!description && (
                 <FieldDescription>{description}</FieldDescription>
-            )}
-
-            {/* suporte ao register para React Hook Form */}
-            {register && (
-                <input
-                    type="hidden"
-                    {...register(name)}
-                    value={date?.toISOString() ?? undefined}
-                />
             )}
         </Field>
     );

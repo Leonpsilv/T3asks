@@ -4,7 +4,7 @@ import {
   createTRPCRouter,
   protectedProcedure,
 } from "~/server/api/trpc";
-import { eq, and, ilike, isNull, between, desc, sql, or, isNotNull, lt, gt } from "drizzle-orm";
+import { eq, and, ilike, isNull, between, desc, sql, or, isNotNull, lt, gt, asc } from "drizzle-orm";
 import { tasks } from "~/server/db/schema";
 import { TasksStatusConfig } from "~/constants/tasksStatus";
 import { TasksCategoryConfig } from "~/constants/tasksCategory";
@@ -136,13 +136,29 @@ export const tasksRouter = createTRPCRouter({
         createdAtEnd: z.date(),
         page: z.number().min(1).default(1),
         pageSize: z.number().min(1).max(100).default(5),
+
+        sortBy: z
+          .enum([
+            "code",
+            "title",
+            "status",
+            "priority",
+            "category",
+            "createdAt",
+            "startedAt",
+            "resolvedAt",
+            "deadline",
+          ])
+          .default("createdAt"),
+
+        sortOrder: z.enum(["asc", "desc"]).default("desc"),
       })
     )
     .query(async ({ ctx, input }) => {
       const conditions = [
         eq(tasks.userId, ctx.session.user.id),
         isNull(tasks.deletedAt),
-        between(tasks.createdAt, input.createdAtStart, input.createdAtEnd)
+        between(tasks.createdAt, input.createdAtStart, input.createdAtEnd),
       ];
 
       if (input.status) {
@@ -150,8 +166,25 @@ export const tasksRouter = createTRPCRouter({
       }
 
       if (input.search) {
-        conditions.push(ilike(tasks.title, `%${input.search}%`)); // TODO: permitir search na descrição e no code também
+        conditions.push(ilike(tasks.title, `%${input.search}%`));
       }
+
+      const orderByColumnMap = {
+        code: tasks.code,
+        title: tasks.title,
+        status: tasks.status,
+        priority: tasks.priority,
+        category: tasks.category,
+        createdAt: tasks.createdAt,
+        startedAt: tasks.startedAt,
+        resolvedAt: tasks.resolvedAt,
+        deadline: tasks.deadline,
+      } as const;
+
+      const orderColumn = orderByColumnMap[input.sortBy] ?? tasks.createdAt;
+      const orderFn = input.sortOrder === "asc" ? asc : desc;
+
+      const offset = (input.page - 1) * input.pageSize;
 
       const totalItemsPromise = ctx.db
         .select({ count: sql`count(*)` })
@@ -159,17 +192,18 @@ export const tasksRouter = createTRPCRouter({
         .where(and(...conditions))
         .then((r) => Number(r[0]?.count ?? 0));
 
-      const offset = (input.page - 1) * input.pageSize;
-
       const itemsPromise = ctx.db
         .select()
         .from(tasks)
         .where(and(...conditions))
-        .orderBy(desc(tasks.createdAt))
+        .orderBy(orderFn(orderColumn))
         .limit(input.pageSize)
         .offset(offset);
 
-      const [totalItems, items] = await Promise.all([totalItemsPromise, itemsPromise])
+      const [totalItems, items] = await Promise.all([
+        totalItemsPromise,
+        itemsPromise,
+      ]);
 
       return {
         items,

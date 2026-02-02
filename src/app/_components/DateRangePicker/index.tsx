@@ -83,7 +83,7 @@ export function SimpleDateRangePicker({
                         variant="outline"
                         id={`date-range-picker-${name}`}
                         disabled={disable}
-                        className="justify-start gap-2 px-2.5 font-normal bg-transparent cursor-pointer"
+                        className="justify-start gap-2 px-2.5 font-normal bg-transparent cursor-pointer !placeholder-gray-300 text-white"
                     >
                         <CalendarIcon className="h-4 w-4" />
                         {renderLabel()}
