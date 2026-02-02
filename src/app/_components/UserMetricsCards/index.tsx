@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { MetricsCardSkeleton } from "./SkeletonLoading";
 
 interface MetricsItem {
   label: string;
@@ -9,37 +10,45 @@ interface MetricsItem {
 interface MetricsCardProps {
   title: string;
   items: MetricsItem[];
+  isLoading?: boolean;
 }
 
 export function MetricsCard({
   title,
   items,
+  isLoading = false
 }: MetricsCardProps) {
   return (
-    <Card className="w-full bg-white/60">
-      <CardHeader>
-        <CardTitle className="text-lg">
-          {title}
-        </CardTitle>
-      </CardHeader>
+    <>
+      {isLoading
+        ?
+        <MetricsCardSkeleton />
+        :
+        <Card className="w-full bg-white/60">
+          <CardHeader>
+            <CardTitle className="text-lg">
+              {title}
+            </CardTitle>
+          </CardHeader>
 
-      <CardContent className="grid grid-cols-2 gap-6">
-        {items.map((item) => (
-          <div
-            key={item.label}
-            className="flex flex-col"
-          >
-            <span className="text-sm text-muted-foreground">
-              {item.label}
-            </span>
-            <span
-              className={`text-3xl font-bold ${item.valueClassName ?? ""}`}
-            >
-              {item.value ?? 0}
-            </span>
-          </div>
-        ))}
-      </CardContent>
-    </Card>
+          <CardContent className="grid grid-cols-2 gap-6">
+            {items.map((item) => (
+              <div
+                key={item.label}
+                className="flex flex-col"
+              >
+                <span className="text-sm text-muted-foreground">
+                  {item.label}
+                </span>
+                <span
+                  className={`text-3xl font-bold ${item.valueClassName ?? ""}`}
+                >
+                  {item.value ?? 0}
+                </span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>}
+    </>
   );
 }

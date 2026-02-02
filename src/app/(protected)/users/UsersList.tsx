@@ -13,6 +13,7 @@ import { Input } from "~/components/ui/input";
 import { Button } from "~/components/ui/button";
 import { api } from "~/trpc/react";
 import { ArrowBigLeft, ArrowBigRight } from "lucide-react";
+import { Skeleton } from "~/components/ui/skeleton";
 
 interface IUserTasksSummary {
     userId: string;
@@ -142,12 +143,16 @@ export default function UsersList() {
 
                 <TableBody>
                     {isFetching ? (
-                        <TableRow>
-                            <TableCell colSpan={columns.length}>
-                                Carregando...
-                            </TableCell>
-                        </TableRow>
-                    ) : (
+                        Array.from({ length: pageSize }).map((_, rowIndex) => (
+                            <TableRow key={`skeleton-row-${rowIndex}`}>
+                                {columns.map((_, colIndex) => (
+                                    <TableCell key={`skeleton-cell-${colIndex}`}>
+                                        <Skeleton className="h-4 w-full" />
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        ))
+                    ) : table.getRowModel().rows.length > 0 ? (
                         table.getRowModel().rows.map((row) => (
                             <TableRow key={row.id}>
                                 {row.getVisibleCells().map((cell) => (
@@ -160,8 +165,18 @@ export default function UsersList() {
                                 ))}
                             </TableRow>
                         ))
+                    ) : (
+                        <TableRow>
+                            <TableCell
+                                colSpan={columns.length}
+                                className="text-center text-muted-foreground"
+                            >
+                                Nenhuma tarefa encontrada
+                            </TableCell>
+                        </TableRow>
                     )}
                 </TableBody>
+
             </Table>
 
             {/* ⏭ Paginação */}

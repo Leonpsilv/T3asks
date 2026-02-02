@@ -127,6 +127,7 @@ export default function DashboardPage() {
 
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-2 mt-[10px] mb-[10px]">
                     <MetricsCard
+                        isLoading={isLoading}
                         title="Resumo dos últimos 30 dias"
                         items={[
                             {
@@ -142,6 +143,7 @@ export default function DashboardPage() {
                     />
 
                     <MetricsCard
+                        isLoading={isLoading}
                         title="Informações importantes"
                         items={[
                             {
@@ -160,6 +162,7 @@ export default function DashboardPage() {
 
                 <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
                     <TasksTable
+                        isLoading={isLoading}
                         title="Em andamento"
                         tasks={inProgress}
                         emptyLabel="Nenhuma tarefa em andamento"
@@ -169,6 +172,7 @@ export default function DashboardPage() {
                     />
 
                     <TasksTable
+                        isLoading={isLoading}
                         title="Concluídas recentemente"
                         tasks={completed}
                         emptyLabel="Nenhuma tarefa concluída"
@@ -178,6 +182,7 @@ export default function DashboardPage() {
                     />
 
                     <TasksTable
+                        isLoading={isLoading}
                         title="Últimas atrasadas"
                         tasks={delayed}
                         emptyLabel="Nenhuma tarefa atrasada 🎉"

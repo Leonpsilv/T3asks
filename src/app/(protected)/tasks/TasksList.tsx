@@ -30,6 +30,7 @@ import { cn } from "~/lib/utils";
 import type { ITasks } from "~/app/_types/tasks.types";
 import { EditTasksModal } from "../../_components/EditTasksModal";
 import { ViewTasksModal } from "~/app/_components/ViewTasksModal";
+import { Skeleton } from "~/components/ui/skeleton";
 
 
 
@@ -289,23 +290,40 @@ export default function TasksList() {
 
                     <TableBody>
                         {isFetching ? (
-                            <TableRow>
-                                <TableCell colSpan={columns.length}>
-                                    Carregando...
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id}>
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell key={cell.id}>
-                                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                            Array.from({ length: pageSize }).map((_, rowIndex) => (
+                                <TableRow key={`skeleton-row-${rowIndex}`}>
+                                    {columns.map((_, colIndex) => (
+                                        <TableCell key={`skeleton-cell-${colIndex}`}>
+                                            <Skeleton className="h-4 w-full" />
                                         </TableCell>
                                     ))}
                                 </TableRow>
                             ))
+                        ) : table.getRowModel().rows.length > 0 ? (
+                            table.getRowModel().rows.map((row) => (
+                                <TableRow key={row.id}>
+                                    {row.getVisibleCells().map((cell) => (
+                                        <TableCell key={cell.id}>
+                                            {flexRender(
+                                                cell.column.columnDef.cell,
+                                                cell.getContext()
+                                            )}
+                                        </TableCell>
+                                    ))}
+                                </TableRow>
+                            ))
+                        ) : (
+                            <TableRow>
+                                <TableCell
+                                    colSpan={columns.length}
+                                    className="text-center text-muted-foreground"
+                                >
+                                    Nenhuma tarefa encontrada
+                                </TableCell>
+                            </TableRow>
                         )}
                     </TableBody>
+
                 </Table>
 
                 <div className="flex gap-2 items-center">
