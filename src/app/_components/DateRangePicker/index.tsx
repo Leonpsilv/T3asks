@@ -106,7 +106,6 @@ export function SimpleDateRangePicker({
                 <FieldDescription>{description}</FieldDescription>
             )}
 
-            {/* Integração com React Hook Form */}
             {register && (
                 <>
                     <input

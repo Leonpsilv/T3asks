@@ -5,7 +5,7 @@ import { Controller, useForm } from "react-hook-form";
 
 import { api } from "~/trpc/react";
 
-import { createTaskSchema, type CreateTaskInputType } from "~/schemas/createTask.schema";
+import { taskFormSchema, type TaskFormInputType } from "~/schemas/task.schema";
 
 
 import { SimpleSelect } from "~/app/_components/SimpleSelect";
@@ -30,8 +30,8 @@ export function CreateTaskForm() {
     const toast = useAppToast();
     const utils = api.useUtils();
 
-    const form = useForm<CreateTaskInputType>({
-        resolver: zodResolver(createTaskSchema),
+    const form = useForm<TaskFormInputType>({
+        resolver: zodResolver(taskFormSchema),
         defaultValues: {
             status: TasksStatusConfig.PENDING.value,
             priority: TasksPriorityConfig.LOW.value,
@@ -48,7 +48,7 @@ export function CreateTaskForm() {
         },
     });
 
-    function onSubmit(data: CreateTaskInputType) {
+    function onSubmit(data: TaskFormInputType) {
         try {
             createTask.mutate({
                 ...data,

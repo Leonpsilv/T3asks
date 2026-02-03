@@ -130,7 +130,6 @@ export default function UsersList() {
                 </Button>
             </div>
 
-            {/* 📋 Tabela */}
             <Table>
                 <TableHeader>
                     {table.getHeaderGroups().map((group) => (
@@ -185,7 +184,6 @@ export default function UsersList() {
 
             </Table>
 
-            {/* ⏭ Paginação */}
             <div className="flex gap-2 items-center justify-end">
                 <Button
                     onClick={() => goToPage(Math.max(filters.page - 1, 1))}

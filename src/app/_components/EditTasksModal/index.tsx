@@ -24,11 +24,8 @@ import { configToOptions } from "~/lib/constantsToOptions";
 
 import { LoaderIcon } from "lucide-react";
 import { cn } from "~/lib/utils";
-import {
-    updateTaskSchema,
-    type UpdateTaskInputType,
-} from "~/schemas/updateTask.schema";
 import { useAppToast } from "~/app/_contexts/toastContext";
+import { taskFormSchema, type TaskFormInputType } from "~/schemas/task.schema";
 
 interface IEditTasksModal {
     data: ITasks | undefined;
@@ -39,8 +36,8 @@ export function EditTasksModal({ data, setData }: IEditTasksModal) {
     const utils = api.useUtils();
     const toast = useAppToast();
 
-    const form = useForm<UpdateTaskInputType>({
-        resolver: zodResolver(updateTaskSchema),
+    const form = useForm<TaskFormInputType>({
+        resolver: zodResolver(taskFormSchema),
     });
 
     const updateTask = api.tasks.update.useMutation({
@@ -64,7 +61,7 @@ export function EditTasksModal({ data, setData }: IEditTasksModal) {
         });
     }, [data, form]);
 
-    function onSubmit(formData: UpdateTaskInputType) {
+    function onSubmit(formData: TaskFormInputType) {
         try {
             if (!data) throw new Error("Falha ao obter dados da tarefa!");
 

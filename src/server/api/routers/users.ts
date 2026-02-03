@@ -10,16 +10,11 @@ import {
   sql,
 } from "drizzle-orm";
 import { TasksStatusConfig } from "~/constants/tasksStatus";
+import { listUsersSchema } from "~/schemas/user.schema";
 
 export const usersRouter = createTRPCRouter({
   list: protectedProcedure
-    .input(
-      z.object({
-        search: z.string().optional(),
-        page: z.number().min(1).default(1),
-        pageSize: z.number().min(1).max(100).default(10),
-      })
-    )
+    .input(listUsersSchema)
     .query(async ({ ctx, input }) => {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
@@ -32,7 +27,6 @@ export const usersRouter = createTRPCRouter({
         conditions.push(ilike(user.name, `%${input.search}%`));
       }
 
-      /** 🔹 total de usuários (sem join para não duplicar) */
       const totalItemsPromise = ctx.db
         .select({ count: sql<number>`count(*)` })
         .from(user)
@@ -41,7 +35,6 @@ export const usersRouter = createTRPCRouter({
 
       const offset = (input.page - 1) * input.pageSize;
 
-      /** 🔹 usuários paginados com métricas */
       const itemsPromise = ctx.db
         .select({
           userId: user.id,
