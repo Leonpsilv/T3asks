@@ -10,19 +10,19 @@ export function calculateTaskDates(
     oldTask?: OldTask
 ) {
     const now = new Date();
+    const oldStartedAt = oldTask?.startedAt
+    const oldResolvedAt = oldTask?.resolvedAt
 
-    const startedAt =
-        status &&
-            status !== TasksStatusConfig.PENDING.value &&
-            !oldTask?.startedAt
+    const startedAt = oldStartedAt ??
+        (status &&
+            status !== TasksStatusConfig.PENDING.value
             ? now
-            : undefined;
+            : undefined);
 
-    const resolvedAt =
-        status === TasksStatusConfig.DONE.value &&
-            !oldTask?.resolvedAt
+    const resolvedAt = oldResolvedAt ??
+        (status === TasksStatusConfig.DONE.value
             ? now
-            : undefined;
+            : undefined);
 
     return { startedAt, resolvedAt };
 }
