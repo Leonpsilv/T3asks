@@ -41,7 +41,7 @@ export function DeleteTasksModal({ data, setData }: IDeleteTasksModal) {
 
     return (
         <Modal open={!!data} setOpen={() => setData(undefined)}>
-            <div className="p-10 space-y-6 max-w-md">
+            <div className="sm:p-10 p-3 space-y-6 max-w-md">
                 <DialogHeader>
                     <DialogTitle className="text-lg">
                         Excluir task

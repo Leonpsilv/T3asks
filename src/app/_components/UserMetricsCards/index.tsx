@@ -40,9 +40,7 @@ export function MetricsCard({
                 <span className="text-sm text-muted-foreground !text-gray-700">
                   {item.label}
                 </span>
-                <span
-                  className={`text-3xl font-bold ${item.valueClassName ?? ""}`}
-                >
+                <span className={`text-xl sm:text-2xl lg:text-3xl font-bold ${item.valueClassName ?? ""}`}>
                   {item.value ?? 0}
                 </span>
               </div>

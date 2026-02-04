@@ -24,11 +24,11 @@ export function ViewTasksModal({ data, setData }: IViewTasksModal) {
 
     return (
         <Modal
-            className="sm:max-w-[900px]"
+            className="w-[95%] max-w-[800px]"
             open={!!data}
             setOpen={() => setData(undefined)}
         >
-            <div className="p-10 space-y-6 max-w-[900px]">
+            <div className="p-4 sm:p-6 md:p-8 space-y-6">
                 <DialogHeader>
                     <DialogTitle className="text-lg">
                         <strong>{data.code} — {data.title}</strong>
@@ -40,7 +40,7 @@ export function ViewTasksModal({ data, setData }: IViewTasksModal) {
                 </DialogHeader>
 
                 <FieldGroup>
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                         <InfoItem label="Código" value={data.code} />
                         <InfoItem
                             label="Status"
@@ -49,7 +49,7 @@ export function ViewTasksModal({ data, setData }: IViewTasksModal) {
                         />
                     </div>
 
-                    <div className="grid grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                         <InfoItem
                             label="Categoria"
                             value={getLabelByValue(
@@ -76,7 +76,7 @@ export function ViewTasksModal({ data, setData }: IViewTasksModal) {
                         />
                     </div>
 
-                    <div className="grid grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                         <InfoItem
                             label="Criada em"
                             value={data.createdAt.toLocaleDateString("pt-BR")}
@@ -102,11 +102,11 @@ export function ViewTasksModal({ data, setData }: IViewTasksModal) {
                     </div>
                 </FieldGroup>
 
-                <div className="flex justify-end">
+                <div className="flex justify-center sm:justify-end">
                     <Button
                         variant="outline"
                         onClick={() => setData(undefined)}
-                        className="min-w-[120px] cursor-pointer"
+                        className="w-full sm:w-auto min-w-[120px] cursor-pointer"
                     >
                         Fechar
                     </Button>

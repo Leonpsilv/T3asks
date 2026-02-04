@@ -10,7 +10,7 @@ export function InfoItem({
     className?: string;
 }) {
     return (
-        <div className="flex flex-col gap-1">
+        <div className="flex md:flex-col flex-row md:gap-1 gap-2">
             <span className="text-sm text-muted-foreground">
                 {label}
             </span>

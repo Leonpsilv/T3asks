@@ -51,52 +51,54 @@ export function TasksTable({
                     columnsCount={columns.length}
                 />
                 :
-                <Card className="bg-white/45">
-                    <CardHeader className="pb-2">
-                        <CardTitle className="text-base">{title}</CardTitle>
-                    </CardHeader>
+                <Card className="bg-white/45 w-full overflow-x-auto max-w-full">
+                    <div>
+                        <CardHeader className="pb-2">
+                            <CardTitle className="text-base">{title}</CardTitle>
+                        </CardHeader>
 
-                    <CardContent>
-                        {tasks?.length === 0 ? (
-                            <p className="text-sm text-muted-foreground">{emptyLabel}</p>
-                        ) : (
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        {columns.map((col) => (
-                                            <TableHead
-                                                key={String(col.key)}
-                                                className={col.headerClassName ?? defaultHeaderCellsClassName}
-                                            >
-                                                {col.label}
-                                            </TableHead>
-                                        ))}
-                                    </TableRow>
-                                </TableHeader>
-
-                                <TableBody>
-                                    {tasks?.map((task) => (
-                                        <TableRow key={task.id}>
-                                            {columns.map((col) => {
-                                                const value = task[col.key as keyof ITasks];
-
-                                                return (
-                                                    <TableCell
-                                                        key={String(col.key)}
-                                                        className={col.bodyClassName ?? defaultBodyCellsClassName}
-                                                    >
-                                                        {col.render
-                                                            ? col.render(value, task)
-                                                            : String(value ?? "—")}
-                                                    </TableCell>
-                                                );
-                                            })}
+                        <CardContent>
+                            {tasks?.length === 0 ? (
+                                <p className="text-sm text-muted-foreground">{emptyLabel}</p>
+                            ) : (
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                            {columns.map((col) => (
+                                                <TableHead
+                                                    key={String(col.key)}
+                                                    className={col.headerClassName ?? defaultHeaderCellsClassName}
+                                                >
+                                                    {col.label}
+                                                </TableHead>
+                                            ))}
                                         </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
-                        )}
-                    </CardContent>
+                                    </TableHeader>
+
+                                    <TableBody>
+                                        {tasks?.map((task) => (
+                                            <TableRow key={task.id}>
+                                                {columns.map((col) => {
+                                                    const value = task[col.key as keyof ITasks];
+
+                                                    return (
+                                                        <TableCell
+                                                            key={String(col.key)}
+                                                            className={col.bodyClassName ?? defaultBodyCellsClassName}
+                                                        >
+                                                            {col.render
+                                                                ? col.render(value, task)
+                                                                : String(value ?? "—")}
+                                                        </TableCell>
+                                                    );
+                                                })}
+                                            </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            )}
+                        </CardContent>
+                    </div>
                 </Card>}
         </>
     );

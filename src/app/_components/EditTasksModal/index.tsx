@@ -81,17 +81,17 @@ export function EditTasksModal({ data, setData }: IEditTasksModal) {
 
     return (
         <Modal
-            className="sm:max-w-[1200px]"
+            className="sm:max-w-[1200px] bg-gray-200"
             open={!!data}
             setOpen={() => setData(undefined)}
         >
-            <div className="p-10 space-y-6 max-w-[1200px]">
+            <div className="sm:p-10 p-3 space-y-6 max-w-[1200px] bg-green-900/70 rounded-md">
                 <DialogHeader>
-                    <DialogTitle className="text-lg">
+                    <DialogTitle className="text-lg text-white">
                         Editar task
                     </DialogTitle>
 
-                    <DialogDescription>
+                    <DialogDescription className="text-white">
                         Atualize as informações da task{" "}
                         <strong>{data?.title}</strong>.
                     </DialogDescription>
@@ -102,7 +102,7 @@ export function EditTasksModal({ data, setData }: IEditTasksModal) {
                     className="space-y-4"
                 >
                     <FieldGroup>
-                        <div className="flex gap-4">
+                        <div className="flex flex-col md:flex-row gap-4">
                             <SimpleInput
                                 name="title"
                                 title="Título"
@@ -117,7 +117,7 @@ export function EditTasksModal({ data, setData }: IEditTasksModal) {
                                 render={({ field }) => (
                                     <SimpleDatePicker
                                         name="deadline"
-                                        className="min-w-fit max-w-[200px]"
+                                        className="min-w-fit md:max-w-[200px]"
                                         title="Data limite"
                                         value={field.value}
                                         onChange={field.onChange}
@@ -132,7 +132,7 @@ export function EditTasksModal({ data, setData }: IEditTasksModal) {
                             render={({ field }) => (
                                 <SimpleTextarea
                                     {...field}
-                                    placeholder=""
+                                    placeholder="Descrição"
                                     name="description"
                                     title="Descrição"
                                     errorMsg={
@@ -143,7 +143,7 @@ export function EditTasksModal({ data, setData }: IEditTasksModal) {
                             )}
                         />
 
-                        <div className="flex gap-4">
+                        <div className="flex flex-col md:flex-row gap-4">
                             <Controller
                                 control={form.control}
                                 name="status"
@@ -194,7 +194,7 @@ export function EditTasksModal({ data, setData }: IEditTasksModal) {
                         </div>
                     </FieldGroup>
 
-                    <div className="flex justify-end gap-4">
+                    <div className="flex flex-col md:flex-row justify-end gap-4">
                         <Button
                             type="button"
                             variant="outline"
@@ -208,7 +208,7 @@ export function EditTasksModal({ data, setData }: IEditTasksModal) {
                         <Button
                             type="submit"
                             disabled={updateTask.isPending}
-                            className="min-w-[120px] cursor-pointer"
+                            className="min-w-[120px] cursor-pointer bg-green-400/50 hover:bg-green-700/50 disabled:cursor-default disabled:bg-green-400/20"
                         >
                             {updateTask.isPending ? (
                                 <LoaderIcon

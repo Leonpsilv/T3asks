@@ -66,10 +66,10 @@ export function CreateTaskForm() {
     }
 
     return (
-        <div className="space-y-4 p-4 bg-white/15 shadow-xl rounded-xl w-[90%] max-w-[1300px] mx-auto">
+        <div className="space-y-4 p-4 bg-white/15 shadow-xl rounded-xl w-full max-w-[900px] mx-auto">
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                 <FieldGroup>
-                    <div className="flex align-center gap-4">
+                    <div className="flex align-center flex-col md:flex-row gap-4">
                         <SimpleInput
                             name="title"
                             type="text"
@@ -103,7 +103,7 @@ export function CreateTaskForm() {
                         errorMsg={form.formState.errors.description?.message}
                     />
 
-                    <div className="flex items-center justify-start gap-4">
+                    <div className="flex flex-col md:flex-row gap-4">
                         <SimpleSelect
                             onChange={(value) => form.setValue("status", value)}
                             options={configToOptions(TasksStatusConfig)}
@@ -131,17 +131,17 @@ export function CreateTaskForm() {
                 </FieldGroup>
 
 
-                <div className="flex items-center justify-between gap-4 max-w-fit">
+                <div className="flex flex-col md:flex-row gap-3">
                     <Button
                         variant="outline"
-                        className="cursor-pointer min-w-[120px]"
+                         className="w-full sm:w-auto min-w-[120px]"
                         onClick={handleBackBtn}
                     >
                         voltar
                     </Button>
 
                     <Button
-                        className="cursor-pointer min-w-[120px] bg-green-400/50 hover:bg-green-700/50 disabled:cursor-default disabled:bg-green-400/20"
+                        className="cursor-pointer w-full sm:w-auto min-w-[120px] bg-green-400/50 hover:bg-green-700/50 disabled:cursor-default disabled:bg-green-400/20"
                         type="submit"
                         disabled={createTask.isPending}
                     >

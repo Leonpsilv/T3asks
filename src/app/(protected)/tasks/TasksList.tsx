@@ -13,24 +13,25 @@ import {
     type Row
 } from "@tanstack/react-table";
 
+import { Edit, Trash, View } from "lucide-react";
 import { useRouter } from "next/navigation";
+import type { DateRange } from "react-day-picker";
+import { DataTable } from "~/app/_components/DataTable";
+import { SimpleDateRangePicker } from "~/app/_components/DateRangePicker";
+import { SimpleSelect } from "~/app/_components/SimpleSelect";
+import { ViewTasksModal } from "~/app/_components/ViewTasksModal";
+import type { ITasks } from "~/app/_types/tasks.types";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { Table, TableBody, TableCell, TableHeader, TableRow } from "~/components/ui/table";
-import { DeleteTasksModal } from "../../_components/DeleteTasksModal";
-import { SimpleDateRangePicker } from "~/app/_components/DateRangePicker";
-import type { DateRange } from "react-day-picker";
 import { TasksCategoryConfig } from "~/constants/tasksCategory";
 import { TasksPriorityConfig } from "~/constants/tasksPriority";
 import { TasksStatusConfig } from "~/constants/tasksStatus";
 import { getLabelByValue } from "~/lib/constantsToLabels";
-import { SimpleSelect } from "~/app/_components/SimpleSelect";
-import { ArrowBigLeft, ArrowBigRight, Edit, Trash, View } from "lucide-react";
 import { cn } from "~/lib/utils";
-import type { ITasks } from "~/app/_types/tasks.types";
+import { DeleteTasksModal } from "../../_components/DeleteTasksModal";
 import { EditTasksModal } from "../../_components/EditTasksModal";
-import { ViewTasksModal } from "~/app/_components/ViewTasksModal";
-import { Skeleton } from "~/components/ui/skeleton";
+import { FiltersActions } from "~/app/_components/DataTable/FiltersAction";
+import { FiltersContainer } from "~/app/_components/DataTable/FiltersContainer";
 
 
 
@@ -240,7 +241,6 @@ export default function TasksList() {
         getCoreRowModel: getCoreRowModel(),
     });
 
-
     return (
         <>
             <DeleteTasksModal setData={setDeleteSelectedTask} data={deleteSelectedTask} />
@@ -249,20 +249,24 @@ export default function TasksList() {
 
             <div className="space-y-4 p-4 rounded-xl shadow-xl bg-white/15 w-[90%] max-w-[1300px] mx-auto">
                 <Button
-                    className="cursor-pointer bg-green-400/50 hover:bg-green-700/50 disabled:cursor-default disabled:bg-green-400/20"
+                    className="cursor-pointer w-full sm:w-fit bg-green-400/50 hover:bg-green-700/50 disabled:cursor-default disabled:bg-green-400/20"
                     onClick={() => router.push("/tasks/form")}
                 >
                     Criar nova tarefa
                 </Button>
-                <div className="flex gap-2">
-                    <Input placeholder="Pesquisar" className="!placeholder-gray-300 text-white" value={search} onChange={(e) => setSearch(e.target.value)} />
+
+                <FiltersContainer>
+                    <Input
+                        placeholder="Pesquisar"
+                        className="!placeholder-gray-300 text-white"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
 
                     <SimpleSelect
                         name="status"
                         value={status}
-                        onChange={(value) => {
-                            setStatus(value);
-                        }}
+                        onChange={setStatus}
                         options={statusOptions}
                     />
 
@@ -273,108 +277,23 @@ export default function TasksList() {
                         dateFormat="dd/MM/yy"
                     />
 
-                    <Button
-                        className="cursor-pointer bg-green-400/50 hover:bg-green-700/50 disabled:cursor-default disabled:bg-green-400/20"
-                        onClick={applyFilters}
-                    >
-                        Aplicar
-                    </Button>
+                    <FiltersActions
+                        onApply={applyFilters}
+                        onClear={clearFilters}
+                        disableClear={!search && !status}
+                    />
+                </FiltersContainer>
 
-                    <Button
-                        variant="outline"
-                        onClick={clearFilters}
-                        disabled={!search && !status}
-                        className="cursor-pointer"
-                    >
-                        Limpar
-                    </Button>
-                </div>
-
-                <Table>
-                    <TableHeader>
-                        {table.getHeaderGroups().map((group) => (
-                            <TableRow key={group.id}>
-                                {group.headers.map((header) => (
-                                    <TableCell
-                                        key={header.id}
-                                        className={cn(
-                                            "text-white",
-                                            header.column.getCanSort() && "cursor-pointer select-none"
-                                        )}
-                                        onClick={
-                                            header.column.getCanSort()
-                                                ? header.column.getToggleSortingHandler()
-                                                : undefined
-                                        }
-                                    >
-                                        {flexRender(
-                                            header.column.columnDef.header,
-                                            header.getContext()
-                                        )}
-                                        {{
-                                            asc: " ▲",
-                                            desc: " ▼",
-                                        }[header.column.getIsSorted() as string] ?? null}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        ))}
-                    </TableHeader>
-
-                    <TableBody>
-                        {isFetching ? (
-                            Array.from({ length: pageSize }).map((_, rowIndex) => (
-                                <TableRow key={`skeleton-row-${rowIndex}`}>
-                                    {columns.map((_, colIndex) => (
-                                        <TableCell key={`skeleton-cell-${colIndex}`}>
-                                            <Skeleton className="h-4 w-full" />
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
-                        ) : table.getRowModel().rows.length > 0 ? (
-                            table.getRowModel().rows.map((row) => (
-                                <TableRow key={row.id}>
-                                    {row.getVisibleCells().map((cell) => (
-                                        <TableCell className="text-white" key={cell.id}>
-                                            {flexRender(
-                                                cell.column.columnDef.cell,
-                                                cell.getContext()
-                                            )}
-                                        </TableCell>
-                                    ))}
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="text-center text-muted-foreground text-white"
-                                >
-                                    Nenhuma tarefa encontrada
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-
-                <div className="flex gap-2 items-center">
-                    <Button
-                        onClick={() => goToPage(Math.max(filters.page - 1, 1))}
-                        disabled={filters.page === 1}
-                        className="cursor-pointer"
-                    >
-                        <ArrowBigLeft />
-                    </Button>
-                    <span className="text-white">{`Página ${data?.page ?? 1} de ${data?.totalPages ?? 1}`}</span>
-                    <Button
-                        onClick={() => goToPage(filters.page + 1)}
-                        disabled={filters.page === data?.totalPages}
-                        className="cursor-pointer"
-                    >
-                        <ArrowBigRight />
-                    </Button>
-                </div>
+                <DataTable
+                    columns={columns}
+                    table={table}
+                    isLoading={isFetching}
+                    page={data?.page ?? 1}
+                    totalPages={data?.totalPages ?? 1}
+                    onPageChange={goToPage}
+                    pageSize={pageSize}
+                    emptyMessage="Nenhuma tarefa encontrada"
+                />
             </div>
         </>
     );

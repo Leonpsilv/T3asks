@@ -1,19 +1,18 @@
 "use client";
 
 import {
-    flexRender,
     getCoreRowModel,
     useReactTable,
     type ColumnDef
 } from "@tanstack/react-table";
 import { useMemo, useState } from "react";
 
-import { Table, TableBody, TableCell, TableHeader, TableRow } from "~/components/ui/table";
-import { Input } from "~/components/ui/input";
+import { DataTable } from "~/app/_components/DataTable";
+import { FiltersActions } from "~/app/_components/DataTable/FiltersAction";
+import { FiltersContainer } from "~/app/_components/DataTable/FiltersContainer";
 import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 import { api } from "~/trpc/react";
-import { ArrowBigLeft, ArrowBigRight } from "lucide-react";
-import { Skeleton } from "~/components/ui/skeleton";
 
 interface IUserTasksSummary {
     userId: string;
@@ -107,102 +106,35 @@ export default function UsersList() {
 
     return (
         <div className="space-y-4 p-4 rounded-xl shadow-xl bg-white/15 w-[90%] max-w-[1300px] mx-auto">
-            <div className="flex gap-2">
+            <FiltersContainer>
                 <Input
                     placeholder="Pesquisar usuário"
                     className="!placeholder-gray-300 text-white"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />
-                <Button
-                    className="cursor-pointer bg-green-400/50 hover:bg-green-700/50 disabled:cursor-default disabled:bg-green-400/20"
-                    onClick={applyFilters}
-                >
-                    Aplicar
-                </Button>
-                <Button
-                    variant="outline"
-                    onClick={clearFilters}
-                    disabled={!search}
-                    className="cursor-pointer"
-                >
-                    Limpar
-                </Button>
-            </div>
 
-            <Table>
-                <TableHeader>
-                    {table.getHeaderGroups().map((group) => (
-                        <TableRow key={group.id}>
-                            {group.headers.map((header) => (
-                                <TableCell className="text-white" key={header.id}>
-                                    {flexRender(
-                                        header.column.columnDef.header,
-                                        header.getContext()
-                                    )}
-                                </TableCell>
-                            ))}
-                        </TableRow>
-                    ))}
-                </TableHeader>
+                <div />
 
-                <TableBody>
-                    {isFetching ? (
-                        Array.from({ length: pageSize }).map((_, rowIndex) => (
-                            <TableRow key={`skeleton-row-${rowIndex}`}>
-                                {columns.map((_, colIndex) => (
-                                    <TableCell key={`skeleton-cell-${colIndex}`}>
-                                        <Skeleton className="h-4 w-full" />
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        ))
-                    ) : table.getRowModel().rows.length > 0 ? (
-                        table.getRowModel().rows.map((row) => (
-                            <TableRow key={row.id}>
-                                {row.getVisibleCells().map((cell) => (
-                                    <TableCell className="text-white" key={cell.id}>
-                                        {flexRender(
-                                            cell.column.columnDef.cell,
-                                            cell.getContext()
-                                        )}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        ))
-                    ) : (
-                        <TableRow>
-                            <TableCell
-                                colSpan={columns.length}
-                                className="text-center text-muted-foreground text-white"
-                            >
-                                Nenhum usuário encontrada
-                            </TableCell>
-                        </TableRow>
-                    )}
-                </TableBody>
+                <div />
 
-            </Table>
+                <FiltersActions
+                    onApply={applyFilters}
+                    onClear={clearFilters}
+                    disableClear={!search}
+                />
+            </FiltersContainer>
 
-            <div className="flex gap-2 items-center justify-end">
-                <Button
-                    onClick={() => goToPage(Math.max(filters.page - 1, 1))}
-                    disabled={filters.page === 1}
-                >
-                    <ArrowBigLeft />
-                </Button>
-
-                <span className="text-white">
-                    Página {data?.page ?? 1} de {data?.totalPages ?? 1}
-                </span>
-
-                <Button
-                    onClick={() => goToPage(filters.page + 1)}
-                    disabled={filters.page === data?.totalPages}
-                >
-                    <ArrowBigRight />
-                </Button>
-            </div>
+            <DataTable
+                columns={columns}
+                table={table}
+                isLoading={isFetching}
+                page={data?.page ?? 1}
+                totalPages={data?.totalPages ?? 1}
+                onPageChange={goToPage}
+                pageSize={pageSize}
+                emptyMessage="Nenhum usuário encontrado"
+            />
         </div>
     );
 }

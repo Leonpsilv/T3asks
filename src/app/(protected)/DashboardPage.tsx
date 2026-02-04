@@ -113,13 +113,19 @@ export default function DashboardPage() {
         <>
             <ViewTasksModal data={viewSelectedTask} setData={setViewSelectedTask} />
             <div className="w-full h-[calc(100%-40px)] p-[20px] m-[20px] rounded-xl bg-white/15 p-8 text-white shadow-xl">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
-                        <h1 className="text-[60px] font-semibold">Bem-vindo, {user.name}! 👋</h1>
+                        <h1 className="text-3xl sm:text-4xl lg:text-[60px] font-semibold">
+                            Bem-vindo, {user.name}! 👋
+                        </h1>
+
                         <LiveClock />
                     </div>
 
-                    <Button onClick={() => router.push("/tasks/form")} className="gap-2 cursor-pointer bg-green-400/50 hover:bg-green-700/50 disabled:cursor-default disabled:bg-green-400/20">
+                    <Button
+                        onClick={() => router.push("/tasks/form")}
+                        className="w-full md:w-auto gap-2 bg-green-400/50 hover:bg-green-700/50"
+                    >
                         <Plus className="h-4 w-4" />
                         Nova tarefa
                     </Button>
@@ -160,7 +166,9 @@ export default function DashboardPage() {
                     />
                 </div>
 
-                <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+                <div
+                    className="grid gap-6 max-w-full md:grid-cols-2 xl:grid-cols-3"
+                >
                     <TasksTable
                         isLoading={isLoading}
                         title="Em andamento"
