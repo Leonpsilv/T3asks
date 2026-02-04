@@ -51,7 +51,7 @@ const defaultCreatedAtStart = new Date(defaultCreatedAtEnd);
 defaultCreatedAtStart.setDate(defaultCreatedAtStart.getDate() - 7);
 
 const statusOptions = [
-    { value: undefined, label: "Todos os status" },
+    { value: "clear", label: "Todos os status" },
     ...Object.values(TasksStatusConfig).map((status) => ({
         value: status.value,
         label: status.label,
@@ -79,7 +79,7 @@ export default function TasksList() {
     const [sorting, setSorting] = useState<{ id: string; desc: boolean }>({ id: "createdAt", desc: true });
 
     const [search, setSearch] = useState("");
-    const [status, setStatus] = useState<string | undefined>();
+    const [status, setStatus] = useState<string | undefined>("clear");
 
     const [filters, setFilters] = useState<ITasksListFilters>(DEFAULT_FILTERS);
 
@@ -99,13 +99,13 @@ export default function TasksList() {
             createdAtStart: dateRange.from || defaultCreatedAtStart,
             createdAtEnd: dateRange.to || defaultCreatedAtEnd,
             ...(search.trim().length > 0 && { search }),
-            ...(status && { status }),
+            ...((status && status !== "clear") && { status }),
         });
     }
 
     function clearFilters() {
         setSearch("");
-        setStatus(undefined);
+        setStatus("clear");
 
         setDateRange({
             from: defaultCreatedAtStart,
@@ -268,6 +268,7 @@ export default function TasksList() {
                         value={status}
                         onChange={setStatus}
                         options={statusOptions}
+                        defaultValue="clear"
                     />
 
                     <SimpleDateRangePicker

@@ -108,6 +108,7 @@ export function DataTable<TData>({
                 <Button
                     onClick={() => onPageChange(Math.max(page - 1, 1))}
                     disabled={page === 1}
+                    className="cursor-pointer"
                 >
                     <ArrowBigLeft />
                 </Button>
@@ -119,6 +120,7 @@ export function DataTable<TData>({
                 <Button
                     onClick={() => onPageChange(page + 1)}
                     disabled={page === totalPages}
+                    className="cursor-pointer"
                 >
                     <ArrowBigRight />
                 </Button>

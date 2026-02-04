@@ -14,7 +14,7 @@ export function FiltersActions({
     return (
         <div className="flex gap-2 sm:col-span-2 lg:col-span-1">
             <Button
-                className="flex-1 bg-green-400/50 hover:bg-green-700/50"
+                className="flex-1 bg-green-400/50 hover:bg-green-700/50 cursor-pointer"
                 onClick={onApply}
             >
                 Aplicar
@@ -22,7 +22,7 @@ export function FiltersActions({
 
             <Button
                 variant="outline"
-                className="flex-1"
+                className="flex-1 cursor-pointer"
                 onClick={onClear}
                 disabled={disableClear}
             >
