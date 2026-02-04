@@ -8,4 +8,5 @@ afterAll(() => {
 
 afterEach(() => {
   jest.clearAllMocks();
+  jest.setSystemTime(new Date(0));
 });
