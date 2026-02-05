@@ -106,7 +106,7 @@ export function ViewTasksModal({ data, setData }: IViewTasksModal) {
                     <Button
                         variant="outline"
                         onClick={() => setData(undefined)}
-                        className="w-full sm:w-auto min-w-[120px] cursor-pointer"
+                        className="w-full sm:w-auto min-w-[120px] cursor-pointer hover:bg-white/80"
                     >
                         Fechar
                     </Button>

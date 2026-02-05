@@ -60,14 +60,14 @@ export function SimpleDatePicker({
                         variant="outline"
                         id={`date-picker-${name}`}
                         disabled={disable}
-                        className="justify-start font-normal bg-transparent cursor-pointer !placeholder-gray-300 text-white"
+                        className="justify-start font-normal bg-transparent cursor-pointer text-white"
                     >
                         {date ? (
                             format(date, "PPP", {
                                 locale: ptBR
                             })
                         ) : (
-                            <span className="text-muted-foreground">
+                            <span className="text-muted-foreground !text-gray-300">
                                 {placeholder}
                             </span>
                         )}

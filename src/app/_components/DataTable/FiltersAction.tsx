@@ -22,7 +22,7 @@ export function FiltersActions({
 
             <Button
                 variant="outline"
-                className="flex-1 cursor-pointer"
+                className="flex-1 cursor-pointer hover:bg-white/80"
                 onClick={onClear}
                 disabled={disableClear}
             >

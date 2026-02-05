@@ -124,7 +124,7 @@ export default function DashboardPage() {
 
                     <Button
                         onClick={() => router.push("/tasks/form")}
-                        className="w-full md:w-auto gap-2 bg-green-400/50 hover:bg-green-700/50"
+                        className="w-full md:w-auto gap-2 bg-green-400/50 hover:bg-green-700/50 cursor-pointer"
                     >
                         <Plus className="h-4 w-4" />
                         Nova tarefa

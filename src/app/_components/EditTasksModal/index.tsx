@@ -200,7 +200,7 @@ export function EditTasksModal({ data, setData }: IEditTasksModal) {
                             variant="outline"
                             onClick={() => setData(undefined)}
                             disabled={updateTask.isPending}
-                            className="min-w-[120px] cursor-pointer"
+                            className="min-w-[120px] cursor-pointer hover:bg-white/80"
                         >
                             Cancelar
                         </Button>
