@@ -67,17 +67,24 @@ export function EditTasksModal({ data, setData }: IEditTasksModal) {
 
             updateTask.mutate({
                 id: data.id,
-                title: formData.title!,
+                title: formData.title,
                 description: formData.description,
-                status: formData.status!,
+                status: formData.status,
                 priority: formData.priority,
                 category: formData.category,
                 deadline: formData.deadline,
             });
-        } catch (error) {
-            toast.error(error)
+        } catch (e) {
+            console.error({ e })
+            const error = "Erro inesperado. Tente novamente em alguns minutos."
+            toast.error(error);
         }
     }
+
+    function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        void form.handleSubmit(onSubmit)(e);
+    };
 
     return (
         <Modal
@@ -98,7 +105,7 @@ export function EditTasksModal({ data, setData }: IEditTasksModal) {
                 </DialogHeader>
 
                 <form
-                    onSubmit={form.handleSubmit(onSubmit)}
+                    onSubmit={handleFormSubmit}
                     className="space-y-4"
                 >
                     <FieldGroup>

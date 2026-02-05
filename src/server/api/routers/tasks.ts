@@ -1,13 +1,13 @@
 import { z } from "zod";
 
+import { and, asc, between, desc, eq, gt, ilike, isNotNull, isNull, lt, sql } from "drizzle-orm";
+import { TasksStatusConfig } from "~/constants/tasksStatus";
+import { listTaskSchema, taskFormSchema, updateTaskSchema } from "~/schemas/task.schema";
 import {
   createTRPCRouter,
   protectedProcedure,
 } from "~/server/api/trpc";
-import { eq, and, ilike, isNull, between, desc, sql, or, isNotNull, lt, gt, asc } from "drizzle-orm";
 import { tasks } from "~/server/db/schema";
-import { TasksStatusConfig } from "~/constants/tasksStatus";
-import { listTaskSchema, taskFormSchema, updateTaskSchema } from "~/schemas/task.schema";
 import { createTask, deleteTask, updateTask } from "../services/taskForms.service";
 
 export const tasksRouter = createTRPCRouter({

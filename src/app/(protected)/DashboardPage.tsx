@@ -2,18 +2,18 @@
 
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Button } from "~/components/ui/button";
-import { TasksStatusConfig, type TaskStatusType } from "~/constants/tasksStatus";
+import { TasksStatusConfig } from "~/constants/tasksStatus";
 import { getLabelByValue } from "~/lib/constantsToLabels";
 import { api } from "~/trpc/react";
-import { TasksTable, type ITasksTableColumn } from "../_components/TasksTable";
-import type { ITasks } from "../_types/tasks.types";
-import { MetricsCard } from "../_components/UserMetricsCards";
-import { useAuth } from "../_contexts/authContext";
-import { TaskActions } from "../_components/TasksTable/TaskActions";
-import { ViewTasksModal } from "../_components/ViewTasksModal";
 import LiveClock from "../_components/LiveClock";
+import { TasksTable, type ITasksTableColumn } from "../_components/TasksTable";
+import { TaskActions } from "../_components/TasksTable/TaskActions";
+import { MetricsCard } from "../_components/UserMetricsCards";
+import { ViewTasksModal } from "../_components/ViewTasksModal";
+import { useAuth } from "../_contexts/authContext";
+import type { ITasks } from "../_types/tasks.types";
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -21,7 +21,7 @@ export default function DashboardPage() {
     const [viewSelectedTask, setViewSelectedTask] = useState<ITasks | undefined>()
 
     const { data, isLoading } = api.tasks.dashboard.useQuery();
-    const { inProgress, completed, delayed, metrics } = data || { inProgress: [], completed: [], delayed: [], metrics: {} };
+    const { inProgress, completed, delayed, metrics } = data ?? { inProgress: [], completed: [], delayed: [], metrics: {} };
 
     const actionsColumn: ITasksTableColumn<ITasks> = {
         key: "actions",
@@ -116,7 +116,7 @@ export default function DashboardPage() {
                 <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div>
                         <h1 className="text-3xl sm:text-4xl lg:text-[60px] font-semibold">
-                            Bem-vindo, {user.name}! 👋
+                            Bem-vindo, {user?.name}! 👋
                         </h1>
 
                         <LiveClock />

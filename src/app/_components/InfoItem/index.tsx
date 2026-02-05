@@ -19,7 +19,7 @@ export function InfoItem({
                 className={className ?? `text-sm font-medium ${multiline ? "whitespace-pre-wrap" : ""
                     }`}
             >
-                {value || "—"}
+                {value ?? "—"}
             </span>
         </div>
     );

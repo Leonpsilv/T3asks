@@ -10,7 +10,6 @@ import { useMemo, useState } from "react";
 import { DataTable } from "~/app/_components/DataTable";
 import { FiltersActions } from "~/app/_components/DataTable/FiltersAction";
 import { FiltersContainer } from "~/app/_components/DataTable/FiltersContainer";
-import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { api } from "~/trpc/react";
 

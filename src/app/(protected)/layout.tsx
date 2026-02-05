@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
-import { getSession } from "~/server/better-auth/server";
 import { AuthProvider } from "~/app/_contexts/authContext";
-import { SidebarProvider, SidebarTrigger } from "~/components/ui/sidebar";
+import { SidebarProvider } from "~/components/ui/sidebar";
+import { getSession } from "~/server/better-auth/server";
 import { AppSidebar } from "../_components/Sidebar";
 
 

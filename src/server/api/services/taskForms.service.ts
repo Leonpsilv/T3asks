@@ -1,13 +1,15 @@
 
+import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
-import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { type TaskFormInputType, type UpdateTaskInput } from "~/schemas/task.schema";
+import { db } from "~/server/db";
 import { tasks } from "~/server/db/schema";
 import { calculateTaskDates } from "./taskDates.service";
-import { TRPCError } from "@trpc/server";
+
+type Database = typeof db
 
 export async function createTask(
-    db: PostgresJsDatabase<any>,
+    db: Database,
     userId: string,
     input: TaskFormInputType
 ) {
@@ -28,7 +30,7 @@ export async function createTask(
 }
 
 export async function updateTask(
-    db: PostgresJsDatabase<any>,
+    db: Database,
     userId: string,
     input: UpdateTaskInput
 ) {
@@ -72,7 +74,7 @@ export async function updateTask(
 
 
 export async function deleteTask(
-    db: PostgresJsDatabase<any>,
+    db: Database,
     userId: string,
     taskId: string
 ) {

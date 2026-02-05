@@ -58,10 +58,16 @@ export function AppSidebar({ className }: AppSidebarProps) {
         try {
             await logoutAction();
             toast.success("Deslogado com sucesso!");
-        } catch (error) {
-            toast.error("Erro inesperado ao deslogar!", error);
+        } catch (e) {
+            console.error({ e })
+            const error = "Erro inesperado. Tente novamente em alguns minutos."
+            toast.error(error);
         }
     }
+
+    function handleLogoutSubmit() {
+        void handleLogout();
+    };
 
     return (
         <>
@@ -128,7 +134,7 @@ export function AppSidebar({ className }: AppSidebarProps) {
                     </SidebarGroup>
                     <SidebarFooter className="w-full absolute bottom-0 mb-6 flex justify-center">
                         <div
-                            onClick={handleLogout}
+                            onClick={handleLogoutSubmit}
                             className="w-[calc(100%-20px)] hover:bg-[#0c0625] p-2 rounded-md cursor-pointer flex justify-center"
                         >
                             <LogOutIcon />

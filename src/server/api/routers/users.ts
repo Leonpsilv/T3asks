@@ -1,16 +1,15 @@
-import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { user, tasks } from "~/server/db/schema";
 import {
-  eq,
   and,
-  isNull,
-  ilike,
   desc,
+  eq,
+  ilike,
+  isNull,
   sql,
 } from "drizzle-orm";
 import { TasksStatusConfig } from "~/constants/tasksStatus";
 import { listUsersSchema } from "~/schemas/user.schema";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
+import { tasks, user } from "~/server/db/schema";
 
 export const usersRouter = createTRPCRouter({
   list: protectedProcedure

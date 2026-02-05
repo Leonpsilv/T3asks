@@ -1,6 +1,6 @@
 import TasksList from "./TasksList";
 
-export default async function Tasks() {
+export default function Tasks() {
 
     return (
         <TasksList />

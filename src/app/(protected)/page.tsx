@@ -1,6 +1,6 @@
 import DashboardPage from "./DashboardPage";
 
-export default async function Dashboard() {
+export default function Dashboard() {
 
     return (
         <DashboardPage />

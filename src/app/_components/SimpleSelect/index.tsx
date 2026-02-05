@@ -54,7 +54,7 @@ export function SimpleSelect({
                 >
                     <SelectGroup>
                         {options.map((option) => (
-                            <SelectItem key={option.value ?? `item-${Math.random()}`} value={option?.value as string}>
+                            <SelectItem key={option.value ?? `item-${Math.random()}`} value={option.value!}>
                                 {option.label}
                             </SelectItem>
                         ))}

@@ -1,6 +1,6 @@
 import UsersList from "./UsersList"
 
-export default async function Users() {
+export default function Users() {
 
     return (
         <UsersList />

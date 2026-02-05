@@ -26,21 +26,32 @@ export default function LoginForm() {
         try {
             setLoginErrorMsg(undefined);
 
-            await loginAction({
+            const result = await loginAction({
                 email: data.email,
                 password: data.password,
             });
 
+            if (!result.success) {
+                toast.error(result.message);
+                setLoginErrorMsg(result.message);
+                return;
+            }
+
             toast.success("Login realizado com sucesso!");
 
             router.replace("/")
-        } catch (error) {
+        } catch (e) {
+            console.error({ e })
+            const error = "Erro inesperado. Tente novamente em alguns minutos."
             toast.error(error);
-            setLoginErrorMsg(error instanceof Error
-                ? error.message
-                : "Erro inesperado. Tente novamente em alguns minutos.");
+            setLoginErrorMsg(error);
         }
     }
+
+    function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        void form.handleSubmit(onSubmit)(e);
+    };
 
     return (
         <div className="w-full max-w-sm rounded-xl bg-white/10 p-8 text-white shadow-xl space-y-6">
@@ -53,7 +64,7 @@ export default function LoginForm() {
             </h3>
 
             <form
-                onSubmit={form.handleSubmit(onSubmit)}
+                onSubmit={handleFormSubmit}
                 className="space-y-4"
             >
                 <FieldGroup>

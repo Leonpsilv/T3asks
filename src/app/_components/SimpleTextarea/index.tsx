@@ -55,7 +55,7 @@ export function SimpleTextarea({
         rows={rows}
         value={value}
         onChange={onChange}
-        {...(register && register(name))}
+        {...register?.(name)}
       />
 
       {!!errorMsg && <FieldError>{errorMsg}</FieldError>}

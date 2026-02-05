@@ -1,9 +1,11 @@
 "use client";
 
-import * as React from "react";
 import { format } from "date-fns";
 import { ptBR } from 'date-fns/locale';
+import * as React from "react";
 
+import { Button } from "~/components/ui/button";
+import { Calendar } from "~/components/ui/calendar";
 import {
     Field,
     FieldDescription,
@@ -11,9 +13,6 @@ import {
     FieldLabel,
 } from "~/components/ui/field";
 import { Popover, PopoverContent, PopoverTrigger } from "~/components/ui/popover";
-import { Button } from "~/components/ui/button";
-import { Calendar } from "~/components/ui/calendar";
-import type { UseFormRegister } from "react-hook-form";
 
 export interface ISimpleDatePickerProps {
     name: string;

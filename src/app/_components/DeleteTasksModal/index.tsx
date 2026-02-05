@@ -34,8 +34,10 @@ export function DeleteTasksModal({ data, setData }: IDeleteTasksModal) {
             deleteTask.mutate({
                 id: data.id,
             });
-        } catch (error) {
-            toast.error(error)
+        } catch (e) {
+            console.error({ e })
+            const error = "Erro inesperado. Tente novamente em alguns minutos."
+            toast.error(error);
         }
     }
 

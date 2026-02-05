@@ -1,14 +1,20 @@
 "use server";
 
-import { redirect } from "next/navigation";
 import { registerSchema, type RegisterInputType } from "~/schemas/register.schema";
 import { auth } from "~/server/better-auth";
 
-export async function registerAction(data: RegisterInputType) {
+type RegisterActionResult =
+    | { success: true }
+    | { success: false; message: string };
+
+export async function registerAction(data: RegisterInputType): Promise<RegisterActionResult> {
     const parsed = registerSchema.safeParse(data)
 
     if (!parsed.success) {
-        throw new Error("Dados inválidos");
+        return {
+            success: false,
+            message: "Dados inválidos",
+        };
     }
 
     const { name, email, password } = parsed.data;
@@ -23,6 +29,11 @@ export async function registerAction(data: RegisterInputType) {
     });
 
     if (!res?.response?.user) {
-        throw new Error("Erro ao criar usuário");
+        return {
+            success: false,
+            message: "Erro ao criar usuário",
+        };
     }
+
+    return { success: true };
 }

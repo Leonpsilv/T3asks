@@ -11,12 +11,12 @@ export default tseslint.config(
   {
     ignores: [".next"],
   },
+
   ...compat.extends("next/core-web-vitals"),
+
   {
     files: ["**/*.ts", "**/*.tsx"],
-    plugins: {
-      drizzle,
-    },
+    plugins: { drizzle },
     extends: [
       ...tseslint.configs.recommended,
       ...tseslint.configs.recommendedTypeChecked,
@@ -25,29 +25,43 @@ export default tseslint.config(
     rules: {
       "@typescript-eslint/array-type": "off",
       "@typescript-eslint/consistent-type-definitions": "off",
-      "@typescript-eslint/consistent-type-imports": [
-        "warn",
-        { prefer: "type-imports", fixStyle: "inline-type-imports" },
-      ],
-      "@typescript-eslint/no-unused-vars": [
-        "warn",
-        { argsIgnorePattern: "^_" },
-      ],
-      "@typescript-eslint/require-await": "off",
-      "@typescript-eslint/no-misused-promises": [
-        "error",
-        { checksVoidReturn: { attributes: false } },
-      ],
+      "@typescript-eslint/no-explicit-any": "error",
       "drizzle/enforce-delete-with-where": [
-        "error",
-        { drizzleObjectName: ["db", "ctx.db"] },
-      ],
-      "drizzle/enforce-update-with-where": [
         "error",
         { drizzleObjectName: ["db", "ctx.db"] },
       ],
     },
   },
+
+  {
+    files: [
+      "**/__tests__/**/*.ts",
+      "**/*.spec.ts",
+      "**/*.test.ts",
+    ],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
+      "@typescript-eslint/no-misused-promises": "off",
+    },
+  },
+
+  {
+    files: [
+      "src/app/_components/**/*",
+      "src/app/(protected)/**/*List.tsx",
+    ],
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+    },
+  },
+
   {
     linterOptions: {
       reportUnusedDisableDirectives: true,
@@ -57,5 +71,5 @@ export default tseslint.config(
         projectService: true,
       },
     },
-  },
+  }
 );

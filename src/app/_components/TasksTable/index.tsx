@@ -47,7 +47,6 @@ export function TasksTable({
             {isLoading
                 ?
                 <TasksTableSkeleton
-                    title={title}
                     columnsCount={columns.length}
                 />
                 :

@@ -46,7 +46,7 @@ export function SimpleInput({
                 disabled={disable}
                 value={value}
                 required={required}
-                {...(register && register(name))}
+                {...register?.(name)}
                 
             />
             {!!errorMsg && <FieldError>{errorMsg}</FieldError>}

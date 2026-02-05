@@ -13,13 +13,11 @@ import {
 import { Skeleton } from "~/components/ui/skeleton";
 
 interface TasksTableSkeletonProps {
-    title: string;
     columnsCount: number;
     rows?: number;
 }
 
 export function TasksTableSkeleton({
-    title,
     columnsCount,
     rows = 4,
 }: TasksTableSkeletonProps) {

@@ -1,4 +1,4 @@
-import { Edit, Trash, View } from "lucide-react";
+import { View } from "lucide-react";
 import type { ITasks } from "~/app/_types/tasks.types";
 import { cn } from "~/lib/utils";
 

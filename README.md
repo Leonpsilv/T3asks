@@ -152,7 +152,7 @@ São validados cenários como:
 
 ### Pré-requisitos
 
-* Node.js >= 18
+* Node.js >= 18.17.0
 * Gerenciador de pacotes (**pnpm** recomendado)
 * Docker instalado e em execução
 * WSL configurado (necessário para Windows)
@@ -188,7 +188,7 @@ No **Windows**, o script deve ser executado via **WSL**:
 5. Sincronize o schema com o banco
 
 ```bash
-pnpm db:push
+pnpm db:migrate
 ```
 
 6. Inicie o projeto

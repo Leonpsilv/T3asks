@@ -1,6 +1,6 @@
 import { CreateTaskForm } from "./TasksForm";
 
-export default async function TasksForm() {
+export default function TasksForm() {
 
     return (
         <CreateTaskForm />

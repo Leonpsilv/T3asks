@@ -57,7 +57,9 @@ export function CreateTaskForm() {
                 ...data,
                 deadline: (!!data?.deadline && data?.deadline.toString().length) ? new Date(data.deadline) : undefined,
             });
-        } catch (error) {
+        } catch (e) {
+            console.error({ e })
+            const error = "Erro inesperado. Tente novamente em alguns minutos."
             toast.error(error);
         }
     }
@@ -68,9 +70,14 @@ export function CreateTaskForm() {
         router.back();
     }
 
+    function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        void form.handleSubmit(onSubmit)(e);
+    };
+
     return (
         <div className="space-y-4 p-4 bg-white/15 shadow-xl rounded-xl w-full max-w-[900px] mx-auto">
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={handleFormSubmit} className="space-y-4">
                 <FieldGroup>
                     <div className="flex align-center flex-col md:flex-row gap-4">
                         <SimpleInput
@@ -108,7 +115,7 @@ export function CreateTaskForm() {
 
                     <div className="flex flex-col md:flex-row gap-4">
                         <SimpleSelect
-                            onChange={(value) => form.setValue("status", value)}
+                            onChange={(value: string) => form.setValue("status", value)}
                             options={configToOptions(TasksStatusConfig)}
                             defaultValue={TasksStatusConfig.PENDING.value}
                             name="status"
@@ -116,7 +123,7 @@ export function CreateTaskForm() {
                         />
 
                         <SimpleSelect
-                            onChange={(value) => form.setValue("priority", value)}
+                            onChange={(value: string) => form.setValue("priority", value)}
                             options={configToOptions(TasksPriorityConfig)}
                             defaultValue={TasksPriorityConfig.LOW.value}
                             name="priority"
@@ -124,7 +131,7 @@ export function CreateTaskForm() {
                         />
 
                         <SimpleSelect
-                            onChange={(value) => form.setValue("category", value)}
+                            onChange={(value: string) => form.setValue("category", value)}
                             options={configToOptions(TasksCategoryConfig)}
                             defaultValue={TasksCategoryConfig.OTHERS.value}
                             name="category"

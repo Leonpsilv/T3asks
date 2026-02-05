@@ -1,17 +1,17 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 
-import { registerAction } from "./actions";
 import { registerSchema, type RegisterInputType } from "~/schemas/register.schema";
+import { registerAction } from "./actions";
 
+import { useRouter } from "next/navigation";
 import { SimpleInput } from "~/app/_components/SimpleInput";
 import { SubmitButton } from "~/app/_components/SubmitButton";
-import { FieldError, FieldGroup } from "~/components/ui/field";
-import { useRouter } from "next/navigation";
 import { useAppToast } from "~/app/_contexts/toastContext";
+import { FieldError, FieldGroup } from "~/components/ui/field";
 
 export default function RegisterForm() {
     const toast = useAppToast();
@@ -22,7 +22,7 @@ export default function RegisterForm() {
     const {
         register,
         handleSubmit,
-        formState: { errors, isValid, isSubmitting },
+        formState: { errors, isSubmitting },
     } = useForm<RegisterInputType>({
         resolver: zodResolver(registerSchema),
     });
@@ -31,19 +31,28 @@ export default function RegisterForm() {
         try {
             setRegisterErrorMsg(undefined);
 
-            await registerAction(data);
+            const result = await registerAction(data);
+
+            if (!result.success) {
+                toast.error(result.message);
+                setRegisterErrorMsg(result.message);
+                return;
+            }
 
             toast.success("Cadastro realizado com sucesso!");
             router.replace("/auth/login")
-        } catch (error) {
+        } catch (e) {
+            console.error({ e })
+            const error = "Erro inesperado. Tente novamente em alguns minutos."
             toast.error(error);
-            setRegisterErrorMsg(
-                error instanceof Error
-                    ? error.message
-                    : "Erro inesperado. Tente novamente em alguns minutos."
-            );
+            setRegisterErrorMsg(error);
         }
     }
+
+    function handleFormSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        void handleSubmit(onSubmit)(e);
+    };
 
     return (
         <div className="w-full max-w-sm rounded-xl bg-white/10 p-8 text-white shadow-xl space-y-6">
@@ -55,7 +64,7 @@ export default function RegisterForm() {
                 Crie a sua conta
             </h3>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={handleFormSubmit} className="space-y-4">
                 <FieldGroup>
                     <SimpleInput
                         register={register}

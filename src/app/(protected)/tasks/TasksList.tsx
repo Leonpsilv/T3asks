@@ -103,8 +103,8 @@ export default function TasksList() {
             ...filters,
             page: 1,
             pageSize,
-            createdAtStart: dateRange.from || start,
-            createdAtEnd: dateRange.to || end,
+            createdAtStart: dateRange.from ?? start,
+            createdAtEnd: dateRange.to ?? end,
             ...(search.trim().length > 0 && { search }),
             ...((status && status !== "clear") && { status }),
         });
