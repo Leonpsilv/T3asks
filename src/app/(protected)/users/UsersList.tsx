@@ -15,9 +15,7 @@ import { Input } from "~/components/ui/input";
 import { api } from "~/trpc/react";
 
 interface IUserTasksSummary {
-    userId: string;
     name: string;
-    email: string;
     totalTasks: number;
     completedRate: number;
     delayedRate: number;
@@ -58,10 +56,6 @@ export default function UsersList() {
         {
             accessorKey: "name",
             header: "Usuário",
-        },
-        {
-            accessorKey: "email",
-            header: "Email",
         },
         {
             accessorKey: "totalTasks",

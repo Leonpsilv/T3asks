@@ -5,18 +5,18 @@ import { api } from "~/trpc/react";
 
 import {
     createColumnHelper,
-    flexRender,
     getCoreRowModel,
-    getSortedRowModel,
     useReactTable,
     type ColumnDef,
     type Row
 } from "@tanstack/react-table";
 
-import { Edit, Trash, View } from "lucide-react";
+import { Edit, Plus, Trash, View } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { DateRange } from "react-day-picker";
 import { DataTable } from "~/app/_components/DataTable";
+import { FiltersActions } from "~/app/_components/DataTable/FiltersAction";
+import { FiltersContainer } from "~/app/_components/DataTable/FiltersContainer";
 import { SimpleDateRangePicker } from "~/app/_components/DateRangePicker";
 import { SimpleSelect } from "~/app/_components/SimpleSelect";
 import { ViewTasksModal } from "~/app/_components/ViewTasksModal";
@@ -30,8 +30,6 @@ import { getLabelByValue } from "~/lib/constantsToLabels";
 import { cn } from "~/lib/utils";
 import { DeleteTasksModal } from "../../_components/DeleteTasksModal";
 import { EditTasksModal } from "../../_components/EditTasksModal";
-import { FiltersActions } from "~/app/_components/DataTable/FiltersAction";
-import { FiltersContainer } from "~/app/_components/DataTable/FiltersContainer";
 
 
 
@@ -46,9 +44,6 @@ interface ITasksListFilters {
     orderDirection?: "asc" | "desc";
 }
 
-const defaultCreatedAtEnd = new Date();
-const defaultCreatedAtStart = new Date(defaultCreatedAtEnd);
-defaultCreatedAtStart.setDate(defaultCreatedAtStart.getDate() - 7);
 
 const statusOptions = [
     { value: "clear", label: "Todos os status" },
@@ -58,21 +53,20 @@ const statusOptions = [
     })),
 ];
 
-const DEFAULT_FILTERS: ITasksListFilters = {
-    page: 1,
-    pageSize: 10,
-    createdAtStart: defaultCreatedAtStart,
-    createdAtEnd: defaultCreatedAtEnd,
-    orderBy: "createdAt",
-    orderDirection: "desc",
-};
-
 export default function TasksList() {
+
+    const getDefaultDates = () => {
+        const end = new Date();
+        const start = new Date(end);
+        start.setDate(start.getDate() - 7);
+        return { start, end };
+    };
+
     const router = useRouter();
 
-    const [dateRange, setDateRange] = useState<DateRange>({
-        from: defaultCreatedAtStart,
-        to: defaultCreatedAtEnd,
+    const [dateRange, setDateRange] = useState<DateRange>(() => {
+        const { start, end } = getDefaultDates();
+        return { from: start, to: end };
     });
 
     const [pageSize] = useState(10);
@@ -81,7 +75,17 @@ export default function TasksList() {
     const [search, setSearch] = useState("");
     const [status, setStatus] = useState<string | undefined>("clear");
 
-    const [filters, setFilters] = useState<ITasksListFilters>(DEFAULT_FILTERS);
+    const [filters, setFilters] = useState<ITasksListFilters>(() => {
+        const { start, end } = getDefaultDates();
+        return {
+            page: 1,
+            pageSize: 10,
+            createdAtStart: start,
+            createdAtEnd: end,
+            orderBy: "createdAt",
+            orderDirection: "desc",
+        };
+    });
 
     const [editSelectedTask, setEditSelectedTask] = useState<ITasks | undefined>();
     const [deleteSelectedTask, setDeleteSelectedTask] = useState<ITasks | undefined>();
@@ -89,15 +93,18 @@ export default function TasksList() {
 
     const queryInput = useMemo(() => (filters), [filters]);
 
-    const { data, isFetching } = api.tasks.list.useQuery(queryInput);
+    const { data, isFetching } = api.tasks.list.useQuery(queryInput, {
+        refetchOnMount: true,
+    });
 
     function applyFilters() {
+        const { start, end } = getDefaultDates();
         setFilters({
             ...filters,
             page: 1,
             pageSize,
-            createdAtStart: dateRange.from || defaultCreatedAtStart,
-            createdAtEnd: dateRange.to || defaultCreatedAtEnd,
+            createdAtStart: dateRange.from || start,
+            createdAtEnd: dateRange.to || end,
             ...(search.trim().length > 0 && { search }),
             ...((status && status !== "clear") && { status }),
         });
@@ -107,12 +114,21 @@ export default function TasksList() {
         setSearch("");
         setStatus("clear");
 
+        const { start, end } = getDefaultDates();
+
         setDateRange({
-            from: defaultCreatedAtStart,
-            to: defaultCreatedAtEnd,
+            from: start,
+            to: end,
         });
 
-        setFilters(DEFAULT_FILTERS);
+        setFilters({
+            page: 1,
+            pageSize: 10,
+            createdAtStart: start,
+            createdAtEnd: end,
+            orderBy: "createdAt",
+            orderDirection: "desc",
+        });
     }
 
     const goToPage = (newPage: number) => {
@@ -252,7 +268,8 @@ export default function TasksList() {
                     className="cursor-pointer w-full sm:w-fit bg-green-400/50 hover:bg-green-700/50 disabled:cursor-default disabled:bg-green-400/20"
                     onClick={() => router.push("/tasks/form")}
                 >
-                    Criar nova tarefa
+                    <Plus className="h-4 w-4" />
+                    Nova tarefa
                 </Button>
 
                 <FiltersContainer>

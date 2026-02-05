@@ -43,7 +43,10 @@ export function CreateTaskForm() {
         onSuccess: async () => {
             toast.success("Tarefa cadastrada com sucesso!");
             form.reset();
-            await utils.tasks.invalidate()
+            await Promise.all([
+                utils.tasks.dashboard.invalidate(),
+                utils.tasks.list.invalidate(),
+            ]);
             router.push("/tasks");
         },
     });
@@ -134,7 +137,7 @@ export function CreateTaskForm() {
                 <div className="flex flex-col md:flex-row gap-3">
                     <Button
                         variant="outline"
-                         className="w-full sm:w-auto min-w-[120px]"
+                        className="w-full sm:w-auto min-w-[120px] cursor-pointer hover:bg-white/80"
                         onClick={handleBackBtn}
                     >
                         voltar

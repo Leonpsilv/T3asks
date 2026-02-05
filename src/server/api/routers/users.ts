@@ -88,9 +88,7 @@ export const usersRouter = createTRPCRouter({
         const delayed = Number(row.delayedTasks ?? 0);
 
         return {
-          userId: row.userId,
           name: row.name,
-          email: row.email,
 
           totalTasks: total,
           inProgress: Number(row.inProgressTasks ?? 0),
