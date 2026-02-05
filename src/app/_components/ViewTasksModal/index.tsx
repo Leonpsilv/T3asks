@@ -34,7 +34,7 @@ export function ViewTasksModal({ data, setData }: IViewTasksModal) {
                         <strong>{data.code} — {data.title}</strong>
                     </DialogTitle>
 
-                    {!!data.description?.length && <DialogDescription>
+                    {!!data.description?.length && <DialogDescription className="max-h-[180px] overflow-y-auto">
                         {data.description}
                     </DialogDescription>}
                 </DialogHeader>

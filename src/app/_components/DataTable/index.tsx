@@ -57,10 +57,15 @@ export function DataTable<TData>({
                                         header.column.columnDef.header,
                                         header.getContext()
                                     )}
-                                    {{
-                                        asc: " ▲",
-                                        desc: " ▼",
-                                    }[header.column.getIsSorted() as string] ?? null}
+
+                                    {header.column.getCanSort() && (
+                                        <>
+                                            {{
+                                                asc: " ▲",
+                                                desc: " ▼",
+                                            }[header.column.getIsSorted() as string] ?? null}
+                                        </>
+                                    )}
                                 </TableCell>
                             ))}
                         </TableRow>

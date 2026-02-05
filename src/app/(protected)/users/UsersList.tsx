@@ -83,6 +83,7 @@ export default function UsersList() {
         data: users,
         columns,
         getCoreRowModel: getCoreRowModel(),
+        enableSorting: false,
     });
 
     function clearFilters() {

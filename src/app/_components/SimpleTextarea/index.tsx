@@ -19,6 +19,7 @@ export interface ISimpleTextareaProps {
   required?: boolean;
   title?: string;
   description?: string;
+  className?: string;
   rows?: number;
   register?:  UseFormRegister<any>;
 }
@@ -32,6 +33,7 @@ export function SimpleTextarea({
   title,
   description,
   required = false,
+  className,
   rows = 4,
   onChange,
   register,
@@ -46,7 +48,7 @@ export function SimpleTextarea({
 
       <Textarea
         id={`textarea-field-${name}`}
-        className="!placeholder-gray-300 text-white"
+        className={className ?? `!placeholder-gray-300 text-white`}
         placeholder={placeholder}
         disabled={disable}
         required={required}

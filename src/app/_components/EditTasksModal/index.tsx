@@ -81,7 +81,7 @@ export function EditTasksModal({ data, setData }: IEditTasksModal) {
 
     return (
         <Modal
-            className="sm:max-w-[1200px] bg-gray-200"
+            className="sm:max-w-[1200px] bg-gray-200 max-h-[calc(100%-30px)] overflow-y-auto"
             open={!!data}
             setOpen={() => setData(undefined)}
         >
@@ -135,6 +135,7 @@ export function EditTasksModal({ data, setData }: IEditTasksModal) {
                                     placeholder="Descrição"
                                     name="description"
                                     title="Descrição"
+                                    className={"max-h-[160px] overflow-y-auto !placeholder-gray-300 text-white"}
                                     errorMsg={
                                         form.formState.errors.description
                                             ?.message
