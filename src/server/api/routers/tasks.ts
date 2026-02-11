@@ -215,6 +215,23 @@ export const tasksRouter = createTRPCRouter({
         holdingNotCompleted: Number(holdingNotCompleted[0]?.count ?? 0),
       },
     };
-  })
+  }),
 
+  board: protectedProcedure
+    .query(async ({ ctx }) => {
+      const userId = ctx.session.user.id;
+
+      const items = await ctx.db
+        .select()
+        .from(tasks)
+        .where(
+          and(
+            eq(tasks.userId, userId),
+            isNull(tasks.deletedAt)
+          )
+        )
+        .orderBy(desc(tasks.createdAt));
+
+      return items;
+    }),
 });
