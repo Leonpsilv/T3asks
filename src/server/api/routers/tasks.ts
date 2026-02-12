@@ -234,4 +234,35 @@ export const tasksRouter = createTRPCRouter({
 
       return items;
     }),
+
+  boardWithFilters: protectedProcedure
+    .input(z.object({
+      createdAtStart: z.date(),
+      createdAtEnd: z.date(),
+      search: z.string().optional(),
+      status: z.string().optional(),
+    }))
+    .query(async ({ ctx, input }) => {
+      const conditions = [
+        eq(tasks.userId, ctx.session.user.id),
+        isNull(tasks.deletedAt),
+        between(tasks.createdAt, input.createdAtStart, input.createdAtEnd),
+      ];
+
+      if (input.status && input.status !== "clear") {
+        conditions.push(eq(tasks.status, input.status));
+      }
+
+      if (input.search && input.search.trim().length > 0) {
+        conditions.push(ilike(tasks.title, `%${input.search}%`));
+      }
+
+      const items = await ctx.db
+        .select()
+        .from(tasks)
+        .where(and(...conditions))
+        .orderBy(desc(tasks.createdAt));
+
+      return items;
+    }),
 });

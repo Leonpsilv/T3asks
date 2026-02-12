@@ -11,7 +11,7 @@ import {
     type Row
 } from "@tanstack/react-table";
 
-import { Edit, Plus, Trash, View } from "lucide-react";
+import { Edit, Eye, EyeOff, Plus, Trash, View } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { DateRange } from "react-day-picker";
 import { DataTable } from "~/app/_components/DataTable";
@@ -58,7 +58,7 @@ export default function TasksList() {
     const getDefaultDates = () => {
         const end = new Date();
         const start = new Date(end);
-        start.setDate(start.getDate() - 7);
+        start.setDate(start.getDate() - 60);
         return { start, end };
     };
 
@@ -89,7 +89,8 @@ export default function TasksList() {
 
     const [editSelectedTask, setEditSelectedTask] = useState<ITasks | undefined>();
     const [deleteSelectedTask, setDeleteSelectedTask] = useState<ITasks | undefined>();
-    const [viewSelectedTask, setViewSelectedTask] = useState<ITasks | undefined>()
+    const [viewSelectedTask, setViewSelectedTask] = useState<ITasks | undefined>();
+    const [isTableVisible, setIsTableVisible] = useState(true);
 
     const queryInput = useMemo(() => (filters), [filters]);
 
@@ -264,13 +265,32 @@ export default function TasksList() {
             <ViewTasksModal data={viewSelectedTask} setData={setViewSelectedTask} />
 
             <div className="space-y-4 p-4 rounded-xl shadow-xl bg-white/15 w-[90%] max-w-[1300px] mx-auto">
-                <Button
-                    className="cursor-pointer w-full sm:w-fit bg-green-400/50 hover:bg-green-700/50 disabled:cursor-default disabled:bg-green-400/20"
-                    onClick={() => router.push("/tasks/form")}
-                >
-                    <Plus className="h-4 w-4" />
-                    Nova tarefa
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
+                    <Button
+                        className="cursor-pointer w-full sm:w-fit bg-green-400/50 hover:bg-green-700/50 disabled:cursor-default disabled:bg-green-400/20"
+                        onClick={() => router.push("/tasks/form")}
+                    >
+                        <Plus className="h-4 w-4" />
+                        Nova tarefa
+                    </Button>
+
+                    <Button
+                        className="cursor-pointer w-full sm:w-fit bg-blue-400/50 hover:bg-blue-700/50"
+                        onClick={() => setIsTableVisible(!isTableVisible)}
+                    >
+                        {isTableVisible ? (
+                            <>
+                                <EyeOff className="h-4 w-4" />
+                                Ocultar tabela
+                            </>
+                        ) : (
+                            <>
+                                <Eye className="h-4 w-4" />
+                                Mostrar tabela
+                            </>
+                        )}
+                    </Button>
+                </div>
 
                 <FiltersContainer>
                     <Input
@@ -302,16 +322,30 @@ export default function TasksList() {
                     />
                 </FiltersContainer>
 
-                <DataTable
-                    columns={columns}
-                    table={table}
-                    isLoading={isFetching}
-                    page={data?.page ?? 1}
-                    totalPages={data?.totalPages ?? 1}
-                    onPageChange={goToPage}
-                    pageSize={pageSize}
-                    emptyMessage="Nenhuma tarefa encontrada"
-                />
+                {isTableVisible ? (
+                    <DataTable
+                        columns={columns}
+                        table={table}
+                        isLoading={isFetching}
+                        page={data?.page ?? 1}
+                        totalPages={data?.totalPages ?? 1}
+                        onPageChange={goToPage}
+                        pageSize={pageSize}
+                        emptyMessage="Nenhuma tarefa encontrada"
+                    />
+                ) : (
+                    <div className="flex items-center justify-center p-12 rounded-lg bg-white/10 border border-white/20">
+                        <div className="text-center space-y-2">
+                            <EyeOff className="h-12 w-12 mx-auto text-gray-400" />
+                            <p className="text-lg font-medium text-white">
+                                Você ocultou a tabela de listagem
+                            </p>
+                            <p className="text-sm text-gray-300">
+                                Clique no botão "Mostrar tabela" para visualizá-la novamente
+                            </p>
+                        </div>
+                    </div>
+                )}
             </div>
         </>
     );

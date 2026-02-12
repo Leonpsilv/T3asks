@@ -13,7 +13,7 @@ import {
     SidebarTrigger,
     useSidebar,
 } from "~/components/ui/sidebar";
-import { Calendar, Home, LogOutIcon, User2Icon } from "lucide-react";
+import { Calendar, Home, Kanban, LogOutIcon, User2Icon } from "lucide-react";
 import { cn } from "~/lib/utils";
 
 import img from "public/icons/white_icon.svg";
@@ -35,6 +35,11 @@ const items = [
         title: "Tarefas",
         url: "/tasks",
         icon: <Calendar />,
+    },
+    {
+        title: "Kanban",
+        url: "/kanban",
+        icon: <Kanban />,
     },
     {
         title: "Usuários",
